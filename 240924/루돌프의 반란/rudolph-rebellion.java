@@ -1,5 +1,10 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
+
 public class Main {
 
     static StringBuilder output = new StringBuilder();
@@ -9,7 +14,7 @@ public class Main {
     static Rudolph rudolph;
     static int[][] isSanta, deltas ={{-1,0},{0,1},{1,0},{0,-1},{-1,-1},{-1,1},{1,-1},{1,1}}; // x,y,산타번호
     static boolean[][] isRudolph;
-    static int N, M, P, C, D;
+    static int N, M, P, C, D, failSanta=0;
 
     public static class Santa {
         int x, y, score, power, sleepTern;
@@ -109,6 +114,8 @@ public class Main {
 
         // 게임 진행
         for(int m=0;m<M;m++) {
+
+            if(failSanta==P) break;
 
             movedRudolph(rudolph,m);
             for(int p=0;p<P;p++) {
@@ -222,11 +229,14 @@ public class Main {
 
         if(!isValid(nx, ny)) {
             santa.fail=true; // 탈락
+            failSanta+=1;
         } else {
             // 포물선 궤적으로 이동 후 산타가 존재하면
-            if(isSanta[nx][ny]!=-1&&!santas[isSanta[nx][ny]].fail) {
-                // 상호작용
-                interaction(santas[isSanta[nx][ny]], direct, isSanta[nx][ny]);
+            if(isSanta[nx][ny]!=-1) {
+                if(!santas[isSanta[nx][ny]].fail){
+                    // 상호작용
+                    interaction(santas[isSanta[nx][ny]], direct, isSanta[nx][ny]);
+                }
             }
             isSanta[nx][ny]= santaNum;
             santa.x=nx;
@@ -243,11 +253,14 @@ public class Main {
 
         if(!isValid(nx, ny)) {
             santa.fail=true; // 탈락
+            failSanta+=1;
         } else {
             // 포물선 궤적으로 이동 후 산타가 존재하면
-            if(isSanta[nx][ny]!=-1&&!santas[isSanta[nx][ny]].fail) {
-                // 상호작용
-                interaction(santas[isSanta[nx][ny]], direct, isSanta[nx][ny]);
+            if(isSanta[nx][ny]!=-1) {
+                if(!santas[isSanta[nx][ny]].fail) {
+                    // 상호작용
+                    interaction(santas[isSanta[nx][ny]], direct, isSanta[nx][ny]);
+                }
             }
             isSanta[nx][ny]= santaNum;
             santa.x=nx;
@@ -264,5 +277,4 @@ public class Main {
         if(nx<0||nx>=N||ny<0||ny>=N) return false;
         return true;
     }
-    
 }
