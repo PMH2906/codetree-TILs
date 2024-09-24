@@ -17,7 +17,7 @@ public class Main {
     static int N, M, P, C, D, failSanta=0;
 
     public static class Santa {
-        int x, y, score, power, sleepTern;
+        int x, y, score=0, power, sleepTern;
         boolean fail, sleep;
 
         public Santa(int x, int y, int power) {
@@ -37,6 +37,12 @@ public class Main {
     }
     public static class MoveRudolph implements Comparable<MoveRudolph> {
         int x, y, dist, nx, ny, direct; // nx,ny는 루돌프가 올길 위치
+
+        public MoveRudolph(int x, int y, int dist) {
+            this.x=x;
+            this.y=y;
+            this.dist=dist;
+        }
 
         public MoveRudolph(int x, int y, int dist, int nx, int ny, int direct) {
             this.x=x;
@@ -111,6 +117,15 @@ public class Main {
             santas[num-1]=new Santa(r-1,c-1,D);
             isSanta[r-1][c-1]=num-1;
         }
+
+//        System.out.println("산타" );
+//        for(int i=0;i<N;i++) {
+//            System.out.println(Arrays.toString(isSanta[i]));
+//        }
+//        System.out.println("루돌프");
+//        for(int i=0;i<N;i++) {
+//            System.out.println(Arrays.toString(isRudolph[i]));
+//        }
 
         // 게임 진행
         for(int m=0;m<M;m++) {
@@ -191,20 +206,28 @@ public class Main {
 
     private static void movedRudolph(Rudolph rudolph, int tern) {
 
-        PriorityQueue<MoveRudolph> pq=new PriorityQueue<>();
+        PriorityQueue<MoveRudolph> minDistSanta=new PriorityQueue<>();
+        PriorityQueue<MoveRudolph> movedMinDistPosition=new PriorityQueue<>();
+
+        // 가장 가까운 산타 찾기
+        for(int p=0;p<P;p++) {
+            if(santas[p].fail) continue;
+            minDistSanta.add(new MoveRudolph(santas[p].x, santas[p].y,calDist(santas[p].x,santas[p].y,rudolph.x,rudolph.y)));
+        }
+
+        MoveRudolph selectSanta=minDistSanta.poll();
+
+        // 해당 산타에서 가장 가까운 움직일 위치 찾기
         for(int d=0;d< deltas.length;d++) {
             int nx=rudolph.x+ deltas[d][0];
             int ny=rudolph.y+ deltas[d][1];
 
             if(!isValid(nx,ny)) continue;
 
-            for(int p=0;p<P;p++) {
-                if(santas[p].fail) continue;
-                pq.add(new MoveRudolph(santas[p].x, santas[p].y,calDist(santas[p].x,santas[p].y,nx,ny),nx,ny,d));
-            }
+            movedMinDistPosition.add(new MoveRudolph(selectSanta.x, selectSanta.y,calDist(selectSanta.x,selectSanta.y,nx,ny),nx,ny,d));
         }
 
-        MoveRudolph selectMovePoint=pq.poll();
+        MoveRudolph selectMovePoint=movedMinDistPosition.poll();
         isRudolph[rudolph.x][rudolph.y]=false;
         isRudolph[selectMovePoint.nx][selectMovePoint.ny]=true;
         rudolph.x=selectMovePoint.nx;
