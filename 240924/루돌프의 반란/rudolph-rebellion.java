@@ -137,8 +137,8 @@ public class Main {
                 if(!santas[p].fail&&!santas[p].sleep) {
                     movedSanta(santas[p], p, m);
                 } else if(!santas[p].fail&&santas[p].sleep&&santas[p].sleepTern+2==m) {
-                    movedSanta(santas[p], p,m);
                     santas[p].sleep=false;
+                    movedSanta(santas[p], p,m);
                 }
             }
             for(int p=0;p<P;p++) {
