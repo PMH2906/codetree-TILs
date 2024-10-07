@@ -54,11 +54,6 @@ public class Main {
             int dir=Integer.parseInt(tokens.nextToken());
             monsters[k]=new Monster(-2,c-1, dir, true);
             moveMonster(monsters[k]);
-
-//            System.out.println("골렘 : "+k);
-//            for(int r=0;r<R;r++) {
-//                System.out.println(Arrays.toString(map[r]));
-//            }
         }
 
         System.out.print(ans);
@@ -110,9 +105,17 @@ public class Main {
         }
 
         ans+=moveGod(monster)+1;
-//        System.out.println(ans);
     }
 
+    /**
+     * 골렘의 중앙 위치 : 3
+     * 골렘의 출구 위치 :2
+     * 골렘의 중앙과 출구가 아닌 위치 : 1
+     * 골렘이 없는 위치 :0
+     *
+     * 골렘의 출구와 중앙 위치(2|3)는 0이 아닌 위치를 모두 탐색할 수 있음(다음 골렘의 1, 다음 골렘의 출구 2, 다음 골렘의 중앙 위치 3(하지만 문제에서는 해당 위치를 만날 일이 없음))
+     * 골렘의 출구와 중앙이 아닌 위치(1)는 골렘의 중앙 위치만 탐색할 수 있음
+     * **/
     private static int moveGod(Monster monster) {
         int maxRow=Integer.MIN_VALUE;
         q=new LinkedList<>();
@@ -125,8 +128,6 @@ public class Main {
 
             if(now.x>maxRow) maxRow= now.x;
 
-            // if(!now.isMoved) continue;
-
             for(int d=0;d<deltas.length;d++) {
 
                 int nx=now.x+deltas[d][0];
@@ -135,8 +136,6 @@ public class Main {
                 // 벽을 넘어가는 경우는 없지만 확인
                 if(nx<0||nx>=R||ny<0||ny>=C) continue;
 
-                // 다음 위치로 움직일 수 있는 경우에
-                // 1이면 출구가 아니기 때문에 다음 골렘 위치로 못 움직임
                 if(map[now.x][now.y]!=1&&map[nx][ny]!=0&&!visited[nx][ny]) {
                     q.add(new God(nx, ny));
                     visited[nx][ny]=true;
@@ -145,7 +144,6 @@ public class Main {
                     visited[nx][ny]=true;
                 }
             }
-
         }
 
         return maxRow;
