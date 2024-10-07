@@ -153,7 +153,7 @@ public class Main {
                             if(!visited[nx2][ny2]&&map[nx2][ny2]!=0) {
                                 // 이어진 골렘의 정령위치로 가서 탐색
                                 q.add(new God(nx2+deltas[d2][0], ny2+deltas[d2][1], true));
-                                visited[nx][ny]=true;
+                                visited[nx2][ny2]=true;
                             }
                         }
                     }
