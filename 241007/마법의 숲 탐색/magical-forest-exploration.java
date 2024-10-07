@@ -144,6 +144,7 @@ public class Main {
                     // 2이면 출구이므로 다음 골렘의 정령위치로 이동
                     if(map[nx][ny]==2&&!visited[nx][ny]) {
                         q.add(new God(nx, ny, false));
+                        visited[nx][ny]=true;
 
                         for(int d2=0;d2<deltas.length;d2++) {
                             int nx2=nx+deltas[d2][0];
