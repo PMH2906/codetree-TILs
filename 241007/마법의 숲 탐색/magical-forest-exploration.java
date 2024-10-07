@@ -126,39 +126,42 @@ public class Main {
 
             if(now.x>maxRow) maxRow= now.x;
 
+            if(!now.isMoved) continue;
+
             for(int d=0;d<deltas.length;d++) {
 
                 int nx=now.x+deltas[d][0];
-                int ny= now.y+deltas[d][1];
+                int ny=now.y+deltas[d][1];
 
                 // 벽을 넘어가는 경우는 없지만 확인
                 if(nx<0||nx>=R||ny<0||ny>=C) continue;
 
                 // 다음 위치로 움직일 수 있는 경우에
-                if(now.isMoved) {
-                    // 1이면 출구가 아니기 때문에 다음 골렘 위치로 못 움직임
-                    if(map[nx][ny]==1&&!visited[nx][ny]) {
-                        q.add(new God(nx, ny, false));
-                        visited[nx][ny]=true;
-                    }
-                    // 2이면 출구이므로 다음 골렘의 정령위치로 이동
-                    if(map[nx][ny]==2&&!visited[nx][ny]) {
-                        q.add(new God(nx, ny, false));
-                        visited[nx][ny]=true;
+                // 1이면 출구가 아니기 때문에 다음 골렘 위치로 못 움직임
+                if(map[nx][ny]==1&&!visited[nx][ny]) {
+                    q.add(new God(nx, ny, false));
+                    visited[nx][ny]=true;
+                }
+                // 2이면 출구이므로 다음 골렘의 정령위치로 이동
+                else if(map[nx][ny]==2&&!visited[nx][ny]) {
+                    q.add(new God(nx, ny, false));
+                    visited[nx][ny]=true;
 
-                        for(int d2=0;d2<deltas.length;d2++) {
-                            int nx2=nx+deltas[d2][0];
-                            int ny2=ny+deltas[d2][1];
+                    for(int d2=0;d2<deltas.length;d2++) {
+                        int nx2=nx+deltas[d2][0];
+                        int ny2=ny+deltas[d2][1];
 
-                            if(nx2<0||nx2>=R||ny2<0||ny2>=C) continue;
+                        if(nx2<0||nx2>=R||ny2<0||ny2>=C) continue;
 
-                            if(!visited[nx2][ny2]&&map[nx2][ny2]!=0) {
-                                // 이어진 골렘의 정령위치로 가서 탐색
-                                q.add(new God(nx2+deltas[d2][0], ny2+deltas[d2][1], true));
-                                visited[nx2][ny2]=true;
-                            }
+                        if(!visited[nx2][ny2]&&map[nx2][ny2]!=0) {
+
+                            // System.out.println(nx + " " + ny + " " + (nx2+deltas[d2][0]) + " " + (ny2+deltas[d2][1]));
+                            // 이어진 골렘의 정령위치로 가서 탐색
+                            q.add(new God(nx2+deltas[d2][0], ny2+deltas[d2][1], true));
+                            visited[nx2+deltas[d2][0]][ny2+deltas[d2][1]]=true;
                         }
                     }
+
                 }
             }
 
