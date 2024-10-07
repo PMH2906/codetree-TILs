@@ -31,10 +31,9 @@ public class Main {
         int x, y;
         boolean isMoved;
 
-        public God(int x, int y, boolean isMoved) {
+        public God(int x, int y) {
             this.x=x;
             this.y=y;
-            this.isMoved =isMoved;
         }
     }
 
@@ -93,7 +92,7 @@ public class Main {
             map=new int[R][C];
             return;
         }
-        map[monster.centerX][monster.centerY]=1;
+        map[monster.centerX][monster.centerY]=3;
         for(int d=0;d<deltas.length;d++) {
 
             // 모든방향확인
@@ -118,7 +117,7 @@ public class Main {
         int maxRow=Integer.MIN_VALUE;
         q=new LinkedList<>();
         visited=new boolean[R][C];
-        q.add(new God(monster.centerX, monster.centerY,true));
+        q.add(new God(monster.centerX, monster.centerY));
         visited[monster.centerX][monster.centerY]=true;
 
         while(q.size()>0) {
@@ -126,7 +125,7 @@ public class Main {
 
             if(now.x>maxRow) maxRow= now.x;
 
-            if(!now.isMoved) continue;
+            // if(!now.isMoved) continue;
 
             for(int d=0;d<deltas.length;d++) {
 
@@ -138,30 +137,12 @@ public class Main {
 
                 // 다음 위치로 움직일 수 있는 경우에
                 // 1이면 출구가 아니기 때문에 다음 골렘 위치로 못 움직임
-                if(map[nx][ny]==1&&!visited[nx][ny]) {
-                    q.add(new God(nx, ny, false));
+                if(map[now.x][now.y]!=1&&map[nx][ny]!=0&&!visited[nx][ny]) {
+                    q.add(new God(nx, ny));
                     visited[nx][ny]=true;
-                }
-                // 2이면 출구이므로 다음 골렘의 정령위치로 이동
-                else if(map[nx][ny]==2&&!visited[nx][ny]) {
-                    q.add(new God(nx, ny, false));
+                } else if(map[now.x][now.y]==1&&map[nx][ny]==3&&!visited[nx][ny]) {
+                    q.add(new God(nx, ny));
                     visited[nx][ny]=true;
-
-                    for(int d2=0;d2<deltas.length;d2++) {
-                        int nx2=nx+deltas[d2][0];
-                        int ny2=ny+deltas[d2][1];
-
-                        if(nx2<0||nx2>=R||ny2<0||ny2>=C) continue;
-
-                        if(!visited[nx2][ny2]&&map[nx2][ny2]!=0) {
-
-                            // System.out.println(nx + " " + ny + " " + (nx2+deltas[d2][0]) + " " + (ny2+deltas[d2][1]));
-                            // 이어진 골렘의 정령위치로 가서 탐색
-                            q.add(new God(nx2+deltas[d2][0], ny2+deltas[d2][1], true));
-                            visited[nx2+deltas[d2][0]][ny2+deltas[d2][1]]=true;
-                        }
-                    }
-
                 }
             }
 
