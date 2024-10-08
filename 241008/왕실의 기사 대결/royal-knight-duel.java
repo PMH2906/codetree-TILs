@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.tools.DiagnosticCollector;
-
+/**
+ * 주의
+ * 1. 움직이지않은 기사의 데미지는 감소하지 않는다. 
+ * **/
 public class Main {
 	static BufferedReader input=new BufferedReader(new InputStreamReader(System.in));
 	static StringBuilder output=new StringBuilder();
@@ -75,19 +77,17 @@ public class Main {
 				}
 			}
 		}
+		
+		// 명령 실행 
 		for(int q=0;q<Q;q++) {
 			tokens=new StringTokenizer(input.readLine());
 			int n=Integer.parseInt(tokens.nextToken());
 			int dir=Integer.parseInt(tokens.nextToken());
 			
+			// 제거되지않은 기사만 명령 실행 
 			if(!drivers[n].removed) {
 				order(n, dir);
 			}
-			
-//			System.out.println(q);
-//			for(int r=0;r<L;r++) {
-//				System.out.println(Arrays.toString(mapDriver[r]));
-//			}
 		}
 		
 		for(int n=1;n<=N;n++) {
@@ -100,7 +100,10 @@ public class Main {
 	
 		// 움직인 기사의 체력 감소 
 		for(int n=1;n<=N;n++) {
+			// 명령 실행한 기사는 데미지 받기 제외 
 			if(n==num) continue;
+			
+			// 현재 명령에 움직인 기사만 데미지 받기 
 			for(Point point:drivers[n].newPoints) {
 				if(map[point.x][point.y]==1) {
 					drivers[n].k-=1;
@@ -122,55 +125,62 @@ public class Main {
 			drivers[n].newPoints=new ArrayList<>();
 		}
 				
-		// 움직일 수 없는 경우 
+		// 움직일 수 없는 경우 명령 종료 
 		if(!move(num,dir,new boolean[L][L])) return;
 
+		// 데미지 계산 
 		damage(num);
 		
-		// map 갱신 
+		// 새로운 map 갱신 
 		mapDriver=new int[L][L];
 		for(int n=1;n<=N;n++) {
 			// 제거된 기사는 map에서 제외 
 			if(drivers[n].removed) continue;
 			
+			// 현재 명령에 움직이지 않은 기사는 기존의 위치로 map 갱신 
 			if(drivers[n].newPoints.size()==0) {
 				for(Point point : drivers[n].points) {
 					mapDriver[point.x][point.y]=n;
 				}
-			} else {
+			} 
+			// 현재 명령에 움진인 기사는 움직인 위치로 map 갱신
+			// 기사의 위치도 갱신 
+			else {
 				for(Point point : drivers[n].newPoints) {
 					mapDriver[point.x][point.y]=n;
 					drivers[n].points=new ArrayList<>(drivers[n].newPoints);
 				}
 			}
 			
-		}
-		
-//		System.out.println("이동 " + dir);
-//		for(int r=0;r<L;r++) {
-//			System.out.println(Arrays.toString(mapDriver[r]));
-//		}	
+		}	
 	}
 
+	/**
+	 * 기사가 명령대로 움직일 수 있는지 확인 
+	 * return : 움직일 수 없으면 false 반환 
+	 * newMapDriver : 해당 명령에서 움직인 기사 위치 
+	 * drivers[n].newPoints : 해당 명령에서 움직인 기사 위치
+	 * **/
 	private static boolean move(int n, int dir, boolean[][] visited) {
 		
 		for(Point point : drivers[n].points) {
 			visited[point.x][point.y]=true;
 			
-			// 이동 
 			int nx=point.x+deltas[dir][0];
 			int ny=point.y+deltas[dir][1];
 		
+			// 밖으로 넘어가거나 벽이면 false 반환 
 			if(nx<0||nx>=L||ny<0||ny>=L||map[nx][ny]==2) return false;
 			
 			if(n!=mapDriver[nx][ny]&&0!=mapDriver[nx][ny]&&!visited[nx][ny]) {
+				
+				// 한 번이라도 false 반환하면 움직이지 못 하므로 false 반환  
 				if(!move(mapDriver[nx][ny],dir,visited)) {
 					return false;
 				}
 			}
 			
 			newMapDriver[nx][ny]=n;
-			// 새롭게 이동한 위치 
 			drivers[n].newPoints.add(new Point(nx,ny));
 		}
 		return true;
