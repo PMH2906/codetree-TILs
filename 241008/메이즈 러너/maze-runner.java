@@ -106,9 +106,9 @@ public class Main {
 		gate[1]=y;
 		
 		for(int k=0;k<K;k++) {
+			movePeople();
 			if(removeCnt==M) break;
 			
-			movePeople();
 //			System.out.println("회" + k+" "+"-------사람 움직인 후  ");
 //			for(int r=0;r<N;r++) {
 //				for(int c=0;c<N;c++) {
