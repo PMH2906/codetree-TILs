@@ -13,7 +13,7 @@ public class Main {
 	static int[][] deltas= {{0,1},{0,-1},{1,0},{-1,0}};
 	static Queue<Integer> nextNum = new LinkedList<>();
 	
-	static PriorityQueue<GetItemInfo> getItemInfo=new PriorityQueue<>();
+	//static PriorityQueue<GetItemInfo> getItemInfo=new PriorityQueue<>();
 	
 	public static class GetItemInfo implements Comparable<GetItemInfo>{
 		@Override
@@ -222,7 +222,8 @@ public class Main {
 
 	public static boolean getFirstItem() {
 		
-		getItemInfo=new PriorityQueue<>();
+		
+		PriorityQueue<GetItemInfo> getItemInfo=new PriorityQueue<>();
 		// 유물 1차 획득이 가장 많은 회전 정보 찾기 
 		for(int r=1;r<4;r++) {
 			for(int c=1;c<4;c++) {
