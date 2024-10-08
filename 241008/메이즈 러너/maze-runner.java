@@ -9,6 +9,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
+/**
+ * 주의. 출구와 참가자의 거리가 가장 가까운 이동 위치 중 벽이 존재하면 다른 이동 위치를 탐색해야 됨.(하지만 현재 이동 위치의 dist보다 작으면 탐색X)
+ * 어려운 점. 정사각형의 가장 좌측 x,y 좌표 찾기(67line참고) 
+ * 어려운 점. 90도 회전 (160line)
+ * */
 public class Main {
 	
 	static BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
@@ -45,15 +50,19 @@ public class Main {
 		public int compareTo(Info o) {
 			return Integer.compare(this.dist, o.dist);
 		}
-		
-		
 	}
+	
+	// 가장 작은 정사각형의 좌측 좌표 찾기 
+	// (1) 가장 작은 크기를 갖는 정사각형이 2개 이상이라면, 
+	// (2) 좌상단 r 좌표가 작은 것이 우선되고, 
+	// (3) 그래도 같으면 c 좌표가 작은 것이 우선됩니다.
 	public static class SmallPoint implements Comparable<SmallPoint>{
 		int minX, minY, size;
 
 		public SmallPoint(int x, int y, int[] gate) {
 			super();
-			this.size=Math.max(Math.abs(gate[0]-x), Math.abs(gate[1]-y))+1;			
+			this.size=Math.max(Math.abs(gate[0]-x), Math.abs(gate[1]-y))+1;	
+			// 출구와 참가자의 x,y좌표 중 작은 x,y좌표에 size-1만큼 빼주기 
 			this.minX=Math.max(0, Math.max(x, gate[0])-(size-1));
 			this.minY=Math.max(0, Math.max(y, gate[1])-(size-1));
 		}
@@ -84,11 +93,11 @@ public class Main {
 		for(int r=0;r<N;r++) {
 			tokens=new StringTokenizer(input.readLine());
 			for(int c=0;c<N;c++) {
-				//peopleMap[r][c]=new LinkedList<>();
 				map[r][c]=Integer.parseInt(tokens.nextToken()); 
 			}
 		}
 		
+		// 참가자 정보 
 		for(int m=0;m<M;m++) {
 			tokens=new StringTokenizer(input.readLine());
 			int x=Integer.parseInt(tokens.nextToken())-1;
@@ -106,20 +115,18 @@ public class Main {
 		gate[1]=y;
 		
 		for(int k=0;k<K;k++) {
+			
+			// 이동 
 			movePeople();
+			
+			//참가자 모두 탈출하면 종료 
 			if(removeCnt==M) break;
 			
-//			System.out.println("회" + k+" "+"-------사람 움직인 후  ");
-//			for(int r=0;r<N;r++) {
-//				for(int c=0;c<N;c++) {
-//					for(int m=0;m<M;m++) {
-//						if(peopleMap[r][c][m]==1) System.out.println(r + " "+ c +" " + m);
-//					}
-//				}
-//			}
+			// 회전 
 			rotate();
 			
 		}
+		
 		output.append(totalmoveCnt+"\n");
 		output.append((gate[0]+1)+" "+(gate[1]+1));
 		System.out.println(output);
@@ -179,25 +186,11 @@ public class Main {
 				}
 			}
 		}
-		
-//		System.out.println("-------사람 회전 후 " + gate[0]+" "+gate[1]);
-//		for(int r=0;r<N;r++) {
-//			for(int c=0;c<N;c++) {
-//				for(int m=0;m<M;m++) {
-//					if(peopleMap[r][c][m]==1) System.out.println(r + " "+ c +" " + m);
-//				}
-//			}
-//		}
-//		System.out.println("-----------------"+smallPoint.minX+" "+smallPoint.minY+" "+smallPoint.size);
-//		for(int r=0;r<N;r++) {
-//			System.out.println(Arrays.toString(map[r]));
-//		}
-		
 	}
 
 	private static void movePeople() {
 		
-		loop : for(int m=0;m<M;m++) {
+		for(int m=0;m<M;m++) {
 			// 해당 사람이 제거되었으면 탐색하지 X 
 			if(peopleList[m].removed) continue;
 			
@@ -213,13 +206,19 @@ public class Main {
 			
 			Info moveInfo=pq.poll();
 			
+			// 출구와 거리가 가장 작은 이동 위치 중 벽이 존재하면 거리가 같은 다음 위치로 이동 
 			while(pq.size()>0) {
+				
 				// 움직이는 곳이 벽이면 다음 사람 탐색 
 				if(map[moveInfo.x][moveInfo.y]>0&&moveInfo.dist==pq.peek().dist) {
 					moveInfo=pq.poll();
-				} else break;
+				} 
+				
+				// 현재 위치가 벽이 아니거나 벽이어도 다음 위치의 dist가 작으면 다음 큐 탐색 X 
+				else break;
 			}
 			
+			// 벽이면 다음 참가자 탐색 
 			if(map[moveInfo.x][moveInfo.y]>0) continue;
 			
 			// 움직이는 곳이 출구
