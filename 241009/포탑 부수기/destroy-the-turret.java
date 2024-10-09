@@ -9,6 +9,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
+/**
+ * 주의! 행과 열 크기 다르면 잘 확인하기
+ * !=, == 조건 잘 확인하기 
+ * 
+ * **/
 public class Main {
 	
 	static BufferedReader input=new BufferedReader(new InputStreamReader(System.in));
@@ -36,8 +41,7 @@ public class Main {
 		public String toString() {
 			return "Potab [x=" + x + ", y=" + y + ", attackTern=" + attackTern + ", power=" + power + ", isAttack="
 					+ isAttack + ", isRemoved=" + isRemoved + "]";
-		}
-		
+		}	
 	}
 	public static class LowPowerPotab implements Comparable<LowPowerPotab>{
 		Potab potab;
@@ -137,36 +141,16 @@ public class Main {
 			
 			Potab lowPowerPotab=potabList.get(selectLowPowerPotab());
 			Potab higherPowerPotab=potabList.get(selectHigherPowerPotab());
-//			
-//			System.out.println(k+"턴 ");
-//			System.out.println(lowPowerPotab.toString());
-//			System.out.println(higherPowerPotab.toString());
 			
 			lowPowerPotab.power+=N+M;
 			lowPowerPotab.attackTern=k;
 			lowPowerPotab.isAttack=true;
-			
-//			System.out.println(k+"턴 공격력 상승  ");
-//			for(Potab potab: potabList) {
-//				System.out.println(potab.toString());
-//			}
 
 			attack(lowPowerPotab, higherPowerPotab);
-			
-//			System.out.println(k+"턴 공격 후 ");
-//			for(Potab potab: potabList) {
-//				System.out.println(potab.toString());
-//			}
+
 			finish();
-			
-//			System.out.println(k+"턴 종료 후 ");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(mapPotabNum[r]));
-//			}
-//			for(Potab potab: potabList) {
-//				System.out.println(potab.toString());
-//			}
 		}
+		
 		Potab higherPowerPotab=potabList.get(selectHigherPowerPotab());
 		System.out.println(higherPowerPotab.power);
 	}
@@ -205,6 +189,7 @@ public class Main {
 			int nx=higherPowerPotab.x+deltas[d][0]<0?N-1:(higherPowerPotab.x+deltas[d][0])%N;
 			int ny=higherPowerPotab.y+deltas[d][1]<0?M-1:(higherPowerPotab.y+deltas[d][1])%M;
 			
+			// 주변 포탑 중 공격 포탑은 제외 
 			if(nx==lowPowerPotab.x&&ny==lowPowerPotab.y) continue;
 			
 			if(mapPotabNum[nx][ny]>0) {
