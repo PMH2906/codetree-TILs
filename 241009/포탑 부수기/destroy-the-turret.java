@@ -134,17 +134,17 @@ public class Main {
 			if(removedPotabCnt==1) break;
 			
 			Potab lowPowerPotab=selectLowPowerPotab();
-			lowPowerPotab.power+=N+M;
-			lowPowerPotab.attackTern=k;
-			lowPowerPotab.isAttack=true;
-			
+//			
 //			System.out.println(k+"턴 공격력 상승  ");
 //			for(Potab potab: potabList) {
 //				System.out.println(potab.toString());
 //			}
-//			
-			
+
 			Potab higherPowerPotab=selectHigherPowerPotab();
+			
+			lowPowerPotab.power+=N+M;
+			lowPowerPotab.attackTern=k;
+			lowPowerPotab.isAttack=true;
 			
 			attack(lowPowerPotab, higherPowerPotab);
 			
@@ -187,7 +187,7 @@ public class Main {
 	}
 
 	private static void attackTwo(Potab lowPowerPotab, Potab higherPowerPotab) {
-		
+
 		// 강한 포탑 공격력 감소 
 		higherPowerPotab.power-=lowPowerPotab.power;
 		higherPowerPotab.isAttack=true;
@@ -200,6 +200,8 @@ public class Main {
 		for(int d=0;d<deltas.length;d++) {
 			int nx=higherPowerPotab.x+deltas[d][0]<0?N-1:(higherPowerPotab.x+deltas[d][0])%N;
 			int ny=higherPowerPotab.y+deltas[d][1]<0?M-1:(higherPowerPotab.y+deltas[d][1])%M;
+			
+			if(nx!=lowPowerPotab.x&&ny!=lowPowerPotab.y)continue;
 			
 			if(mapPotabNum[nx][ny]>0) {
 				// 주변 포탑 공격력 감소 
@@ -255,6 +257,7 @@ public class Main {
 				int ny=now.y+deltas[d][1]<0?M-1:(now.y+deltas[d][1])%M;
 				
 				if(mapPotabNum[nx][ny]>0&&!visited[nx][ny]) {
+					visited[nx][ny]=true;
 					q.add(new RootInfo(nx, ny, now.root, potabList.get(mapPotabNum[nx][ny])));
 				}
 			}
