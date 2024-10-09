@@ -14,7 +14,7 @@ public class Main {
 	static BufferedReader input=new BufferedReader(new InputStreamReader(System.in));
 	static StringBuilder output=new StringBuilder();
 	static StringTokenizer tokens;
-	static int N, M, K, removedPotabCnt;
+	static int N, M, K, removedPotabCnt=0;
 	static int[][] mapPotabNum, deltas= {{0,1},{1,0},{0,-1},{-1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
 	static List<Potab> potabList=new ArrayList<>();
 	
@@ -41,10 +41,12 @@ public class Main {
 	}
 	public static class LowPowerPotab implements Comparable<LowPowerPotab>{
 		Potab potab;
+		int potabNum;
 
-		public LowPowerPotab(Potab potab) {
+		public LowPowerPotab(Potab potab, int potabNum) {
 			super();
 			this.potab = potab;
+			this.potabNum=potabNum;
 		}
 
 		@Override
@@ -64,10 +66,12 @@ public class Main {
 	
 	public static class HigherPowerPotab implements Comparable<HigherPowerPotab>{
 		Potab potab;
+		int potabNum;
 
-		public HigherPowerPotab(Potab potab) {
+		public HigherPowerPotab(Potab potab, int potabNum) {
 			super();
 			this.potab = potab;
+			this.potabNum=potabNum;
 		}
 
 		@Override
@@ -88,7 +92,7 @@ public class Main {
 	public static class RootInfo {
 		int x, y;
 		
-		List<Potab> root=new ArrayList<>();
+		List<Integer> root=new ArrayList<>();
 		
 		public RootInfo(int x, int y) {
 			super();
@@ -96,7 +100,7 @@ public class Main {
 			this.y = y;
 		}
 		
-		public RootInfo(int x, int y, List<Potab> root, Potab potab) {
+		public RootInfo(int x, int y, List<Integer> root, int potab) {
 			super();
 			this.x = x;
 			this.y = y;
@@ -116,36 +120,37 @@ public class Main {
 		potabList.add(new Potab(0,0,0,0, false,false));
 		
 		// 포탑 & map 채우기 
-		int cnt=0;
 		for(int r=0;r<N;r++) {
 			tokens=new StringTokenizer(input.readLine());
-			for(int c=0;c<N;c++) {
+			for(int c=0;c<M;c++) {
 				int power=Integer.parseInt(tokens.nextToken());
 				if(power>0) {
-					cnt+=1;
+					removedPotabCnt+=1;
 					potabList.add(new Potab(r,c,power,0,false,false));
-					mapPotabNum[r][c]=cnt;
+					mapPotabNum[r][c]=removedPotabCnt;
 				}
 			}
 		}
-		removedPotabCnt=cnt;
 		
 		for(int k=1;k<=K;k++) {
-			if(removedPotabCnt==1) break;
+			if(removedPotabCnt<=1) break;
 			
-			Potab lowPowerPotab=selectLowPowerPotab();
+			Potab lowPowerPotab=potabList.get(selectLowPowerPotab());
+			Potab higherPowerPotab=potabList.get(selectHigherPowerPotab());
 //			
-//			System.out.println(k+"턴 공격력 상승  ");
-//			for(Potab potab: potabList) {
-//				System.out.println(potab.toString());
-//			}
-
-			Potab higherPowerPotab=selectHigherPowerPotab();
+//			System.out.println(k+"턴 ");
+//			System.out.println(lowPowerPotab.toString());
+//			System.out.println(higherPowerPotab.toString());
 			
 			lowPowerPotab.power+=N+M;
 			lowPowerPotab.attackTern=k;
 			lowPowerPotab.isAttack=true;
 			
+//			System.out.println(k+"턴 공격력 상승  ");
+//			for(Potab potab: potabList) {
+//				System.out.println(potab.toString());
+//			}
+
 			attack(lowPowerPotab, higherPowerPotab);
 			
 //			System.out.println(k+"턴 공격 후 ");
@@ -162,7 +167,7 @@ public class Main {
 //				System.out.println(potab.toString());
 //			}
 		}
-		Potab higherPowerPotab=selectHigherPowerPotab();
+		Potab higherPowerPotab=potabList.get(selectHigherPowerPotab());
 		System.out.println(higherPowerPotab.power);
 	}
 
@@ -180,14 +185,10 @@ public class Main {
 
 	private static void attack(Potab lowPowerPotab, Potab higherPowerPotab) {
 		
-		// 루트 탐색 
 		if(!attackOne(lowPowerPotab, higherPowerPotab)) {
 			attackTwo(lowPowerPotab, higherPowerPotab);
 		}	
-	}
-
-	private static void attackTwo(Potab lowPowerPotab, Potab higherPowerPotab) {
-
+		
 		// 강한 포탑 공격력 감소 
 		higherPowerPotab.power-=lowPowerPotab.power;
 		higherPowerPotab.isAttack=true;
@@ -196,12 +197,15 @@ public class Main {
 			higherPowerPotab.isRemoved=true;
 			removedPotabCnt-=1;
 		} 
+	}
+
+	private static void attackTwo(Potab lowPowerPotab, Potab higherPowerPotab) {
 		
 		for(int d=0;d<deltas.length;d++) {
 			int nx=higherPowerPotab.x+deltas[d][0]<0?N-1:(higherPowerPotab.x+deltas[d][0])%N;
 			int ny=higherPowerPotab.y+deltas[d][1]<0?M-1:(higherPowerPotab.y+deltas[d][1])%M;
 			
-			if(nx!=lowPowerPotab.x&&ny!=lowPowerPotab.y)continue;
+			if(nx==lowPowerPotab.x&&ny==lowPowerPotab.y) continue;
 			
 			if(mapPotabNum[nx][ny]>0) {
 				// 주변 포탑 공격력 감소 
@@ -227,38 +231,30 @@ public class Main {
 		while(q.size()>0) {
 			
 			RootInfo now=q.poll();
-			if(now.x==higherPowerPotab.x&&now.y==higherPowerPotab.y) {
-				
-				// 강한 포탑 공격력 감소 
-				higherPowerPotab.power-=lowPowerPotab.power;
-				higherPowerPotab.isAttack=true;
-				if(higherPowerPotab.power<=0) {
-					mapPotabNum[higherPowerPotab.x][higherPowerPotab.y]=0;
-					higherPowerPotab.isRemoved=true;
-					removedPotabCnt-=1;
-				} 
-				
-				// 경로 포탑 공격력 감소 
-				for(int n=0;n<now.root.size()-1;n++) {
-					now.root.get(n).power-=(lowPowerPotab.power/2);
-					now.root.get(n).isAttack=true;
-					if(now.root.get(n).power<=0) {
-						mapPotabNum[now.root.get(n).x][now.root.get(n).y]=0;
-						now.root.get(n).isRemoved=true;
-						removedPotabCnt-=1;
-					} 
-				}
-				
-				return true;
-			}
 			
 			for(int d=0;d<4;d++) {
 				int nx=now.x+deltas[d][0]<0?N-1:(now.x+deltas[d][0])%N;
 				int ny=now.y+deltas[d][1]<0?M-1:(now.y+deltas[d][1])%M;
 				
-				if(mapPotabNum[nx][ny]>0&&!visited[nx][ny]) {
+				if(nx==higherPowerPotab.x&&ny==higherPowerPotab.y) {
+					
+					// 경로 포탑 공격력 감소 
+					for(Integer potabNum : now.root) {
+						Potab potab=potabList.get(potabNum);
+						potab.power-=(lowPowerPotab.power/2);
+						potab.isAttack=true;
+						if(potab.power<=0) {
+							mapPotabNum[potab.x][potab.y]=0;
+							potab.isRemoved=true;
+							removedPotabCnt-=1;
+						} 
+					}
+					
+					return true;
+				}
+				else if(mapPotabNum[nx][ny]>0&&!visited[nx][ny]) {
 					visited[nx][ny]=true;
-					q.add(new RootInfo(nx, ny, now.root, potabList.get(mapPotabNum[nx][ny])));
+					q.add(new RootInfo(nx, ny, now.root, mapPotabNum[nx][ny]));
 				}
 			}
 		}
@@ -266,25 +262,25 @@ public class Main {
 		return false;
 	}
 
-	private static Potab selectHigherPowerPotab() {
+	private static int selectHigherPowerPotab() {
 		PriorityQueue<HigherPowerPotab> pq=new PriorityQueue<>();
 		
 		for(int n=1;n<potabList.size();n++) {
 			if(potabList.get(n).isRemoved) continue;
 			
-			pq.add(new HigherPowerPotab(potabList.get(n)));
+			pq.add(new HigherPowerPotab(potabList.get(n),n));
 		}
-		return pq.poll().potab;
+		return pq.poll().potabNum;
 	}
 
-	private static Potab selectLowPowerPotab() {
+	private static int selectLowPowerPotab() {
 		PriorityQueue<LowPowerPotab> pq=new PriorityQueue<>();
 		
 		for(int n=1;n<potabList.size();n++) {
 			if(potabList.get(n).isRemoved) continue;
 			
-			pq.add(new LowPowerPotab(potabList.get(n)));
+			pq.add(new LowPowerPotab(potabList.get(n),n));
 		}
-		return pq.poll().potab;
+		return pq.poll().potabNum;
 	}
 }
