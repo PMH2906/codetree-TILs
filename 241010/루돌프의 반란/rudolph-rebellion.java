@@ -5,6 +5,14 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
+/**
+ * 루돌프의 움직이는 조건 잘 보기!!
+ * 루돌프는 가장 가까운 산타를 향해 8가지 방향으로 움직일 수 있는데, 가까워지는 방향으로 돌진한다.
+ * 
+ * 산타의 움직이는 조건 잘 보기!
+ * 움직일 수 있는 4칸 중에서 현재 칸보다 멀어지는 칸을 제외하고 움직일 수 있으나, 산타나 벽이 있으면 움직일 수 없음 
+ * 우선순위 큐에 현재보다 멀어지는 방향의 칸은 안 넣어도 될 듯!
+ * **/
 public class Main {
 	
 	static BufferedReader input=new BufferedReader(new InputStreamReader(System.in));
@@ -58,6 +66,7 @@ public class Main {
 			if(this.dist==o.dist) {
 				if(this.santa.x==o.santa.x) {
 					if(this.santa.y==o.santa.y) {
+						// 8가지 방향 중에서 산타와 가장 가까운 방향으로 우선순위 큐 설정  
 						return Integer.compare(this.movedDist, o.movedDist);
 					}
 					return Integer.compare(this.santa.y, o.santa.y)*-1;
@@ -118,31 +127,18 @@ public class Main {
 		}
 		
 		for(tern=0;tern<M;tern++) {
+			// 모든 산타가 탈락되면 종료 
 			if(removedSantaCnt==P) break;
 			
 			moveRudolph();
-			
-//			System.out.println(tern+"턴 루돌프 움직임 ");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(map[r]));
-//			}
-//			
+	
 			moveSanta();
-			
-//			System.out.println(tern+"턴 산타 움직임 ");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(map[r]));
-//			}
-//			
+		
+			// 탈락하지 않는 산타에게 점수 부여 
 			for(int p=1;p<=P;p++) {
 				if(santas[p].isRemoved) continue;
 				santas[p].score+=1;
 			}
-			
-//			System.out.println(tern+"턴 ");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(map[r]));
-//			}
 		}
 		
 		for(int p=1;p<=P;p++) {
@@ -157,6 +153,7 @@ public class Main {
 		loop : for(int p=1;p<=P;p++) {
 			
 			PriorityQueue<MoveSanta> pq=new PriorityQueue<>();
+			int originDist=(rudolph.x-santas[p].x)*(rudolph.x-santas[p].x)+(rudolph.y-santas[p].y)*(rudolph.y-santas[p].y);
 			
 			// 기절하거나 제거된 산타는 제외 
 			if(santas[p].isRemoved||santas[p].stopTern+2>tern) continue;
@@ -168,23 +165,19 @@ public class Main {
 				if(nx<0||ny>=N||ny<0||ny>=N) continue;
 				
 				int dist=(rudolph.x-nx)*(rudolph.x-nx)+(rudolph.y-ny)*(rudolph.y-ny);
-				pq.add(new MoveSanta(dist, d, nx, ny));
+				if(originDist>dist) pq.add(new MoveSanta(dist, d, nx, ny));
 			}
 			
 			MoveSanta moveSanta=pq.poll();
-			int originDist=(rudolph.x-santas[p].x)*(rudolph.x-santas[p].x)+(rudolph.y-santas[p].y)*(rudolph.y-santas[p].y);
 			while(true) {
-				// 산타가 더 이상 움직일 수 있는 위치가 없음 
-				if(pq.size()==0) continue loop;
-				// 산타가 이동하는 위치에 다른 산타가 있으면
+				// 산타가 이동하는 위치에 다른 산타가 있으면 다음 이동 위치 탐색 
 				if(map[moveSanta.moveX][moveSanta.moveY]>0) {
-					// 가까워질 수 있다면 다음 이동 위치가 존재하면 갱신 
-					if(originDist>pq.peek().dist) {
-						moveSanta=pq.poll();
-					} 
-					// 최단 거리가 없으므로 산타는 움직이지 않음 
-					else continue loop;
-				} else break;
+					// 산타가 더 이상 움직일 수 있는 위치가 없으면 다음 산타 탐색  
+					if(pq.size()==0) continue loop;
+					moveSanta=pq.poll();
+				} 
+				// 산타가 이동하는 위치에 다른 산타가 없으면 다음 행동 진행 
+				else break;
 			}
 			
 			// 이동 위치에 루돌프 있으면 
@@ -209,6 +202,7 @@ public class Main {
 	private static void moveRudolph() {
 		PriorityQueue<MoveRudolph> pq=new PriorityQueue<>();
 		
+		// 가장 가까운 산타와 해당 산타와 가장 가까운 8가지 방향 중 하나 탐색 
 		for(int d=0;d<deltas.length;d++) {
 			for(int p=1;p<=P;p++) {
 				if(santas[p].isRemoved) continue; // 탈락한 산타는 제외				
@@ -232,7 +226,7 @@ public class Main {
 		if(map[rudolph.x][rudolph.y]>0) {
 			// 점수얻기
 			santas[map[rudolph.x][rudolph.y]].score+=rudolph.power;
-			// 기절한 턴 입력 
+			// 산타 기절 턴 입력 
 			santas[map[rudolph.x][rudolph.y]].stopTern=tern;
 			// 산타 이동 
 			interact(santas[map[rudolph.x][rudolph.y]], moveRudolph.direct, rudolph.power);
@@ -246,7 +240,7 @@ public class Main {
 		int nx=santa.x+deltas[direct][0]*power;
 		int ny=santa.y+deltas[direct][1]*power;
 		
-		// 밖으로 나가면 
+		// 밖으로 나가면 탈락 
 		if(nx<0||nx>=N||ny<0||ny>=N) {
 			santa.isRemoved=true;
 			map[santa.x][santa.y]=0;
@@ -263,6 +257,8 @@ public class Main {
 		if(map[santa.x][santa.y]>0) {
 			interact(santas[map[santa.x][santa.y]], direct, 1);
 		}
+		
+		// 모든 산타와 상호작용 후 map에 자신의 산타 정보 입력 
  		map[santa.x][santa.y]=santa.num;
 	}
 
