@@ -41,21 +41,25 @@ public class Main {
 	
 	public static class MoveRudolph implements Comparable<MoveRudolph>{
 		Santa santa;
-		int dist, direct, moveX, moveY;
+		int dist, direct, moveX, moveY, movedDist;
 		
 		public MoveRudolph(Santa santa, int direct, int moveX, int moveY) {
 			super();
 			this.santa = santa;
-			this.dist = (moveX-santa.x)*(moveX-santa.x)+(moveY-santa.y)*(moveY-santa.y);
+			this.dist = (rudolph.x-santa.x)*(rudolph.x-santa.x)+(rudolph.y-santa.y)*(rudolph.y-santa.y);
 			this.direct = direct;
 			this.moveX = moveX;
 			this.moveY = moveY;
+			this.movedDist=(moveX-santa.x)*(moveX-santa.x)+(moveY-santa.y)*(moveY-santa.y);
 		}
 
 		@Override
 		public int compareTo(MoveRudolph o) {
 			if(this.dist==o.dist) {
 				if(this.santa.x==o.santa.x) {
+					if(this.santa.y==o.santa.y) {
+						return Integer.compare(this.movedDist, o.movedDist);
+					}
 					return Integer.compare(this.santa.y, o.santa.y)*-1;
 				}
 				return Integer.compare(this.santa.x, o.santa.x)*-1;
@@ -124,7 +128,7 @@ public class Main {
 //			}
 //			
 			moveSanta();
-//			
+			
 //			System.out.println(tern+"턴 산타 움직임 ");
 //			for(int r=0;r<N;r++) {
 //				System.out.println(Arrays.toString(map[r]));
