@@ -112,25 +112,10 @@ public class Main {
 			if(passCnt==M) break;
 			
 			movePeople();
-			
-			
-//			System.out.println(k+"---------------------아동");
-//			for(int m=1;m<=M;m++) {
-//				System.out.println(peoples[m].toString());
-//			}
-//			
+
 			if(passCnt==M) break;
 			
 			rotate90();
-			
-//			System.out.println(k+"---------------------호ㅣ전");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(map[r]));
-//			}
-//			
-//			for(int m=1;m<=M;m++) {
-//				System.out.println(peoples[m].toString());
-//			}
 		}
 		
 		output.append(ans+"\n");
