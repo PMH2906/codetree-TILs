@@ -119,6 +119,7 @@ public class Main {
 //				System.out.println(peoples[m].toString());
 //			}
 //			
+			if(passCnt==M) break;
 			
 			rotate90();
 			
