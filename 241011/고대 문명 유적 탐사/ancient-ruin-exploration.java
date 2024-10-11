@@ -151,16 +151,11 @@ public class Main {
 		for(int k=0;k<K;k++) {
 			ans=0;
 			find();
-//			System.out.println(k+"턴 ");
-//			for(int r=0;r<5;r++) {
-//				System.out.println(Arrays.toString(map[r]));
-//			}
-			getDia();
-//			System.out.println(k+"턴 ");
-//			for(int r=0;r<5;r++) {
-//				System.out.println(Arrays.toString(map[r]));
-//			}
+			
 			if(ans==0) break;
+			
+			getDia();
+			
 			output.append(ans+" ");
 		}
 		System.out.println(output);
