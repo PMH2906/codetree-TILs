@@ -45,9 +45,11 @@ public class Main {
 		}
 	}
 
-	
+	/**
+	 * 가장 가까운 베이스 캠프 선택
+	 * **/
 	static public class MovePoint implements Comparable<MovePoint>{
-		int x, y, dist;
+		int x, y, dist,direct;
 
 		public MovePoint(int x, int y, int dist) {
 			super();
@@ -58,13 +60,14 @@ public class Main {
 
 		@Override
 		public int compareTo(MovePoint o) {
-//			if(this.dist==o.dist) {
-//				return Integer.compare(this.direct,o.direct);
-//			}
 			return Integer.compare(this.dist,o.dist);
 		}
 	}
 	
+	/**
+	 * 가장 가까운 베이스 캠프 선택
+	 * 움직일 수 있는 최단 거리 중 행이 작은 베이스캠프, 행이 같다면 열이 작은 베이스 캠프 선택 
+	 * **/
 	static public class Point implements Comparable<Point>{
 		int x, y, dist;
 
@@ -119,9 +122,8 @@ public class Main {
 			
 			move(tern);
 			
-//			System.out.println(tern+"움직임 -");
+			// 편의점에 도착하면 해당 칸 못 지니가도록 갱신 
 			for(int m=1;m<=Math.min(M, tern-1);m++) {
-//				System.out.println(peoples[m].toString());
 				if(peoples[m].pass) continue;
 				if(peoples[m].x==stroes[m].x&&peoples[m].y==stroes[m].y) {
 					isNonpass[peoples[m].x][peoples[m].y]=true;
@@ -130,23 +132,11 @@ public class Main {
 				}
 			}
 			
-//			System.out.println(tern+"----------------------------");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(isNonpass[r]));
-//			}
-//			
+			// 모든 사람이 편의점 도착하면 종료 
 			if(passCnt==M) break;
 			
 			if(tern<=M) enter(tern);
 			
-//			System.out.println(tern+"----------------------------");
-//			for(int r=0;r<N;r++) {
-//				System.out.println(Arrays.toString(isNonpass[r]));
-//			}
-//			System.out.println(tern+"들어감");
-//			for(int m=1;m<=Math.min(M, tern);m++) {
-//				System.out.println(peoples[m].toString());
-//			}
 		}
 		output.append(tern);
 		
@@ -194,10 +184,13 @@ public class Main {
 			int minDist=Integer.MAX_VALUE;
 			int minDistDirect=Integer.MAX_VALUE;
 			
+			// 4방향을 시작 점으로 편의점까지 거리 측정 
+			// 4방향은 서로가 가는 길에 영향을 주면안되므로 따로 bfs 동작해야 함 
 			for(int d=0;d<deltas.length;d++) {
 				PriorityQueue<MovePoint> pq=new PriorityQueue<>();
 				boolean[][] visited=new boolean[N][N];
 				
+				// 4가지 방향 중 벽을 나가거나 못 움직이는 곳은 pass 
 				int nextNx=peoples[m].x+deltas[d][0];
 				int nextNy=peoples[m].y+deltas[d][1];
 				
@@ -207,9 +200,11 @@ public class Main {
 				pq.add(new MovePoint(nextNx, nextNy, 0));
 				visited[nextNx][nextNy]=true;
 				
+				// 4가지 방향을 시작으로 탐색 시작 
 				while(pq.size()>0) {
 					MovePoint now=pq.poll();
 					
+					// 편의점 도착 시 현재 가장 작은 거리를 비교해서 해당 거리보다 작으면 가장 작은 거리와 방향 갱신 
 					if(stroes[m].x==now.x&&stroes[m].y==now.y) {
 						if(minDist>now.dist) {
 							minDistDirect=d;
@@ -233,11 +228,10 @@ public class Main {
 				}
 			}
 
+			// 가장 작은 거리로 갈 수 있는 방향 선택 
 			peoples[m].x+=deltas[minDistDirect][0];
 			peoples[m].y+=deltas[minDistDirect][1];
 			
 		}
 	}
-	
-	
 }
