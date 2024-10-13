@@ -61,8 +61,11 @@ public class Main {
 
 		@Override
 		public int compareTo(MovePoint o) {
-			return 0;
-//			return Integer.compare(this.dist,o.dist);
+//			return 0;
+			if(this.dist==o.dist) {
+				return Integer.compare(this.direct,o.direct);
+			}
+			return Integer.compare(this.dist,o.dist);
 		}
 	}
 	
@@ -230,7 +233,9 @@ public class Main {
 //				}
 //			}
 			
-			Queue<MovePoint> pq=new LinkedList<>();
+			// 이미 상하좌우 순으로 넣었고, dist 순으로 삽입되기때문에 dist로 한 번 더 정렬하면 상하좌우 순이 깨질 수 있음. 
+			//
+			PriorityQueue<MovePoint> pq=new PriorityQueue<>();
 			boolean[][] visited=new boolean[N][N];
 	
 			pq.add(new MovePoint(peoples[m].x, peoples[m].y, 0,-1));
