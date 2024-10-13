@@ -6,232 +6,222 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
-
+/*
+ * 코드트리_빵
+ */
 public class Main {
-	
-	static BufferedReader input=new BufferedReader(new InputStreamReader(System.in));
-	static StringBuilder output=new StringBuilder();
-	static StringTokenizer tokens;
-	static int N, M, tern, passCnt=0;
-	static int[][] map, deltas= {{-1,0},{0,-1},{0,1},{1,0}};
-	static boolean[][] isNonpass;
-	static Stroe[] stroes;
-	static People[] peoples;
-	
-	static public class Stroe {
-		int x, y;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int N, M, T;
+    static int[][] board;
+    static Point[] camps;
+    static Person[] persons;
+    static int[] dr = { -1, 0, 0, 1 }; // dr, dc(상좌우하 좌표)
+    static int[] dc = { 0, -1, 1, 0 };
 
-		public Stroe(int x, int y) {
-			super();
-			this.x = x;
-			this.y = y;
-		}
-		
-	}
-	
-	static public class People {
-		int x, y;
-		boolean pass=false;
+    /*
+     * Point(좌표 정보를 담을 클래스)
+     */
+    static class Point {
+        int r, c; // r, c(좌표의 위치)
 
-		public People(int x, int y) {
-			super();
-			this.x = x;
-			this.y = y;
-		}
+        public Point(int r, int c) {
+            this.r = r;
+            this.c = c;
+        }
+    }
 
-		@Override
-		public String toString() {
-			return "People [x=" + x + ", y=" + y + ", pass=" + pass + "]";
-		}
-	}
+    /*
+     * Person(사람 정보를 담을 클래스)
+     */
+    static class Person {
+        int r, c; // r, c(사람의 위치)
+        Point store; // store(가고 싶은 편의점)
+        Point camp; // camp(편의점과 가장 가까이 있는 베이스 캠프)
+        boolean isArrived; // isArrived(도착 여부)
 
-	/**
-	 * 가장 가까운 베이스 캠프 선택
-	 * **/
-	static public class MovePoint implements Comparable<MovePoint>{
-		int x, y, dist,direct;
+        public Person(int r, int c, Point store) {
+            this.r = r;
+            this.c = c;
+            this.store = store;
+            isArrived = false;
+        }
+    }
 
-		public MovePoint(int x, int y, int dist) {
-			super();
-			this.x = x;
-			this.y = y;
-			this.dist = dist;
-		}
+    /*
+     * 편의점 이동 준비
+     */
+    static void init(StringTokenizer st) throws IOException {
+        N = Integer.parseInt(st.nextToken()); // N(격자의 크기)
+        M = Integer.parseInt(st.nextToken()); // M(사람의 수)
 
-		@Override
-		public int compareTo(MovePoint o) {
-			return Integer.compare(this.dist,o.dist);
-		}
-	}
-	
-	/**
-	 * 가장 가까운 베이스 캠프 선택
-	 * 움직일 수 있는 최단 거리 중 행이 작은 베이스캠프, 행이 같다면 열이 작은 베이스 캠프 선택 
-	 * **/
-	static public class Point implements Comparable<Point>{
-		int x, y, dist;
+        board = new int[N][N]; // board(격자의 정보)
+        camps = new Point[N * N - M + 1]; // camps(베이스 캠프 저장 배열)
+        int campId = 0;
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < N; j++) {
+                int num = Integer.parseInt(st.nextToken());
+                if (num == 1) { // 1이라면 베이스 캠프가 위치한 곳이므로
+                    camps[campId++] = new Point(i, j); // 베이스 캠프를 저장
+                    board[i][j] = num;
+                }
+            }
+        }
 
-		public Point(int x, int y, int dist) {
-			super();
-			this.x = x;
-			this.y = y;
-			this.dist = dist;
-		}
+        persons = new Person[M + 1]; // persons(사람 저장 배열)
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine());
+            int r = Integer.parseInt(st.nextToken()) - 1;
+            int c = Integer.parseInt(st.nextToken()) - 1;
+            Point store = new Point(r, c); // 편의점 저장
+            Person person = new Person(0, 0, store); // 사람 저장
+            persons[i] = person;
+        }
+    }
 
-		@Override
-		public int compareTo(Point o) {
-			if(this.dist==o.dist) {
-				if(this.x==o.x) {
-					return Integer.compare(this.y, o.y);
-				}
-				return Integer.compare(this.x, o.x);
-			}
-			return Integer.compare(this.dist,o.dist);
-		}
-	}
-	
-	public static void main(String[] args) throws IOException {
-		tokens=new StringTokenizer(input.readLine());
-		
-		N=Integer.parseInt(tokens.nextToken());
-		M=Integer.parseInt(tokens.nextToken());
-		
-		// 초기화
-		map=new int[N][N];
-		isNonpass=new boolean[N][N];
-		stroes=new Stroe[M+1];
-		peoples=new People[M+1];
-		tern=0;
-		
-		for(int r=0;r<N;r++) {
-			tokens=new StringTokenizer(input.readLine());
-			for(int c=0;c<N;c++) {
-				map[r][c]=Integer.parseInt(tokens.nextToken());
-			}
-		}
-		
-		for(int m=1;m<=M;m++) {
-			tokens=new StringTokenizer(input.readLine());
-			int x=Integer.parseInt(tokens.nextToken())-1;
-			int y=Integer.parseInt(tokens.nextToken())-1;
-			stroes[m]=new Stroe(x, y);
-		}
-		
-		while(true) {
-			tern+=1;
-			
-			move(tern);
-			
-			// 편의점에 도착하면 해당 칸 못 지니가도록 갱신 
-			for(int m=1;m<=Math.min(M, tern-1);m++) {
-				if(peoples[m].pass) continue;
-				if(peoples[m].x==stroes[m].x&&peoples[m].y==stroes[m].y) {
-					isNonpass[peoples[m].x][peoples[m].y]=true;
-					peoples[m].pass=true;
-					passCnt+=1;
-				}
-			}
-			
-			// 모든 사람이 편의점 도착하면 종료 
-			if(passCnt==M) break;
-			
-			if(tern<=M) enter(tern);
-			
-		}
-		output.append(tern);
-		
-		System.out.print(output);
-	}
+    /*
+     * 편의점 이동
+     */
+    static void move() {
+        T = 0; // T(편의점에 도착하는 시간)
+        while (true) {
+            T++; // 시간 증가
+            for (int i = 0; i < M; i++) { // 순서 1
+                Person person = persons[i];
+                if (!person.isArrived && i + 1 < T) { // 사람의 순서가 T보다 작다면 가고 싶은 편의점 방향으로 이동
+                    int direction = selectLocation(person); // direction(이동 방향)
+                    person.r = person.r + dr[direction];
+                    person.c = person.c + dc[direction];
+                }
+            }
+            for (int i = 0; i < M; i++) { // 순서 2
+                Person person = persons[i];
+                if (!person.isArrived && i + 1 < T) {
+                    if (person.r == person.store.r && person.c == person.store.c) { // 도착한 편의점은 지나갈 수 없도록 함
+                        board[person.store.r][person.store.c] = -1;
+                        person.isArrived = true;
+                    }
+                }
+            }
+            for (int i = 0; i < M; i++) { // 순서 3
+                Person person = persons[i];
+                if (T == i + 1) { // 사람의 순서가 T와 같다면 편의점과 가장 가까운 위치에 있는 베이스 캠프로 이동
+                    Point camp = selectCamp(person.store); // 편의점과 가장 가까이 있는 베이스 캠프를 선택
+                    person.camp = camp;
+                    person.r = person.camp.r; // 베이스 캠프로 이동
+                    person.c = person.camp.c;
+                    board[person.r][person.c] = -1; // 도착한 베이스 캠프는 지나갈 수 없도록 함
+                }
+            }
+            if (isOver()) { // 모든 사람이 도착했다면 종료
+                break;
+            }
+        }
+    }
 
+    /*
+     * 편의점과 가장 가까이 있는 베이스 캠프 선택
+     */
+    static Point selectCamp(Point store) {
+        Point selectedCamp = null; // selectedCamp(최단 거리에 있는 베이스 캠프)
+        int minDistance = Integer.MAX_VALUE; // minDistance(최단 거리)
 
-	private static void enter(int tern) {
-		PriorityQueue<Point> pq=new PriorityQueue<>();
-		boolean[][] visited=new boolean[N][N];
-		
-		pq.add(new Point(stroes[tern].x, stroes[tern].y, 0));
-		visited[stroes[tern].x][stroes[tern].y]=true;
-		
-		while(pq.size()>0) {
-			Point now=pq.poll();
-			
-			// 베이스 캠프 선택 
-			if(map[now.x][now.y]==1) {
-				peoples[tern]=new People(now.x,now.y);
-				isNonpass[now.x][now.y]=true;
-				return;
-			}
-			
-			for(int d=0;d<deltas.length;d++) {
-				int nx=now.x+deltas[d][0];
-				int ny=now.y+deltas[d][1];
-				
-				if(nx<0||nx>=N||ny<0||ny>=N) continue;
-				
-				// 다음 이동 위치 선택 
-				if(!isNonpass[nx][ny]&&!visited[nx][ny]) {
-					pq.add(new Point(nx, ny, now.dist+1));
-					visited[nx][ny]=true;
-				}
-			}
-		}
-	}
+        for (int i = 0; i < camps.length; i++) { // BFS 상좌우하 탐색을 통해 가장 가까운 위치에 있는 베이스 캠프를 찾아냄
+            if (camps[i] == null) {
+                break;
+            }
+            if (board[camps[i].r][camps[i].c] == -1) {
+                continue; // 이미 사용한 베이스 캠프라면 넘어감
+            }
 
+            Point camp = camps[i];
+            Queue<int[]> queue = new LinkedList<>();
+            queue.add(new int[] { camp.r, camp.c, 0 });
+            boolean[][] visited = new boolean[N][N];
+            visited[camp.r][camp.c] = true;
 
-	private static void move(int tern) {
-		for(int m=1;m<=Math.min(M, tern-1);m++) {
-			if(peoples[m].pass) continue;
-			
-			int minDist=Integer.MAX_VALUE;
-			int minDistDirect=Integer.MAX_VALUE;
-			
-			// 4방향을 시작 점으로 편의점까지 거리 측정 
-			// 4방향은 서로가 가는 길에 영향을 주면안되므로 따로 bfs 동작해야 함 
-			loop: for(int d=0;d<deltas.length;d++) {
-				PriorityQueue<MovePoint> pq=new PriorityQueue<>();
-				boolean[][] visited=new boolean[N][N];
-				
-				// 4가지 방향 중 벽을 나가거나 못 움직이는 곳은 pass 
-				int nextNx=peoples[m].x+deltas[d][0];
-				int nextNy=peoples[m].y+deltas[d][1];
-				
-				if(nextNx<0||nextNx>=N||nextNy<0||nextNy>=N) continue;
-				if(isNonpass[nextNx][nextNy]) continue;
-				
-				pq.add(new MovePoint(nextNx, nextNy, 0));
-				visited[nextNx][nextNy]=true;
-				
-				// 4가지 방향을 시작으로 탐색 시작 
-				while(pq.size()>0) {
-					MovePoint now=pq.poll();
-					
-					// 편의점 도착 시 현재 가장 작은 거리를 비교해서 해당 거리보다 작으면 가장 작은 거리와 방향 갱신 
-					if(stroes[m].x==now.x&&stroes[m].y==now.y) {
-						if(minDist>now.dist) {
-							minDistDirect=d;
-							minDist=now.dist;
-						}
-						continue loop;
-					}
-					
-					for(int innerD=0;innerD<deltas.length;innerD++) {
-						int nx=now.x+deltas[innerD][0];
-						int ny=now.y+deltas[innerD][1];
-						
-						if(nx<0||nx>=N||ny<0||ny>=N) continue;
-						
-						// 다음 이동 위치 선택 
-						if(!isNonpass[nx][ny]&&!visited[nx][ny]) {
-							pq.add(new MovePoint(nx, ny, now.dist+1));
-							visited[nx][ny]=true;
-						}
-					}
-				}
-			}
+            while (!queue.isEmpty()) {
+                int[] now = queue.poll();
+                int distance = now[2];
+                for (int d = 0; d < 4; d++) {
+                    int nr = now[0] + dr[d];
+                    int nc = now[1] + dc[d];
+                    if (nr == store.r && nc == store.c) {
+                        if (distance < minDistance) {
+                            minDistance = distance; // distance가 minDistance보다 작으면 베이스 캠프 갱신
+                            selectedCamp = camp;
+                        } else if (distance == minDistance) { // distance가 minDistance와 같으면
+                            if (camp.r < selectedCamp.r || (camp.r == selectedCamp.r && camp.c < selectedCamp.c)) {
+                                selectedCamp = camp; // distance가 minDistance와 같으면 행이 작은, 열이 작은 베이스 캠프 순으로 갱신
+                            }
+                        }
+                        continue;
+                    }
+                    if (nr < 0 || nr >= N || nc < 0 || nc >= N || board[nr][nc] == -1 || visited[nr][nc]) {
+                        continue;
+                    }
+                    visited[nr][nc] = true;
+                    queue.add(new int[] { nr, nc, distance + 1 });
+                }
+            }
+        }
+        return selectedCamp;
+    }
 
-			// 가장 작은 거리로 갈 수 있는 방향 선택 
-			peoples[m].x+=deltas[minDistDirect][0];
-			peoples[m].y+=deltas[minDistDirect][1];
-			
-		}
-	}
+    /*
+     * 편의점 이동 방향 찾기
+     */
+    static int selectLocation(Person person) {
+        Queue<int[]> queue = new LinkedList<>(); // BFS 상좌우하 탐색을 통해 최단 거리로 이동하는 방향 찾기
+        queue.add(new int[] { person.r, person.c, -1 });
+        boolean[][] visited = new boolean[N][N];
+        visited[person.r][person.c] = true;
+
+        while (!queue.isEmpty()) {
+            int[] now = queue.poll();
+            if (now[0] == person.store.r && now[1] == person.store.c) {
+                return now[2]; // 가장 처음 이동한 방향을 반환
+            }
+            for (int d = 0; d < 4; d++) {
+                int nr = now[0] + dr[d];
+                int nc = now[1] + dc[d];
+                if (nr < 0 || nr >= N || nc < 0 || nc >= N || board[nr][nc] == -1 || visited[nr][nc]) {
+                    continue;
+                }
+                visited[nr][nc] = true;
+                if (now[2] == -1) {
+                    queue.add(new int[] { nr, nc, d });
+                } else {
+                    queue.add(new int[] { nr, nc, now[2] });
+                }
+            }
+        }
+        return -1;
+    }
+    
+    /*
+     * 모든 사람 도착 여부
+     */
+    static boolean isOver() {
+        for (int i = 0; i < M; i++) {
+            if (!persons[i].isArrived) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+     * 편의점 이동 시간 출력
+     */
+    static void print() {
+        System.out.println(T);
+    }
+
+    public static void main(String[] args) throws IOException {
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        init(st);
+        move();
+        print();
+    }
 }
