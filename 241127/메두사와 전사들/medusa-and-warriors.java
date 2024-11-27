@@ -215,25 +215,13 @@ public class Main {
 		int y=house[1]+deltas[3][1];
 		int size=3;
 		int cnt=0;
-		boolean[][] seeDown=new boolean[N][N];
+		boolean[][] seeTemp=new boolean[N][N];
 		
 		while(y<N) {
 			startX=x-(size/2)<0?0:x-(size/2);
 			endX=x+(size/2)>=N?N-1:x+(size/2);
 			
-			for(int nx=startX;nx<=endX;nx++) {
-				if(nx>=x-1&&nx<=x+1) {
-					if(size==3) seeDown[nx][y]=true;
-					else if(mapWarrior[nx][y-1]||!seeDown[nx][y-1]) seeDown[nx][y]=false;
-					else seeDown[nx][y]=true;
-				} else if(nx<x-1) {
-					if(mapWarrior[nx][y-1]||mapWarrior[nx+1][y-1]||!seeDown[nx][y-1]||!seeDown[nx+1][y-1]) seeDown[nx][y]=false;
-					else seeDown[nx][y]=true;
-				} else if(nx>x+1) {
-					if(mapWarrior[nx][y-1]||mapWarrior[nx-1][y-1]||!seeDown[nx][y-1]||!seeDown[nx-1][y-1]) seeDown[nx][y]=false;
-					else seeDown[nx][y]=true;
-				}
-			}
+			for(int nx=startX;nx<=endX;nx++) seeTemp[nx][y]=true;
 			
 			x+=deltas[3][0];
 			y+=deltas[3][1];
@@ -242,14 +230,61 @@ public class Main {
 		
 		for(int m=0;m<M;m++) {
 			if(warriors[m].isRemoved) continue;
-			if(seeDown[warriors[m].x][warriors[m].y]) {
+			if(!seeTemp[warriors[m].x][warriors[m].y]) continue;
+			
+			x=warriors[m].x+deltas[3][0];
+			y=warriors[m].y+deltas[3][1];
+			size=1;
+			
+			// 가운데 
+			if(warriors[m].x==house[0]) {	
+				while(y<N) {
+					seeTemp[x][y]=false;
+					x+=deltas[3][0];
+					y+=deltas[3][1];
+				}
+			}
+			
+			// 위
+			else if(warriors[m].x<house[0]) {	
+				while(y<N) {
+					startX=x-size<0?0:x-size;
+					endX=warriors[m].x;
+					
+					for(int nx=startX;nx<=endX;nx++) seeTemp[nx][y]=false;
+					
+					x+=deltas[3][0];
+					y+=deltas[3][1];
+					size+=1;
+				}
+			}
+			
+			// 아래 
+			else if(warriors[m].x>house[0]) {	
+				while(y<N) {
+					startX=warriors[m].x;
+					endX=x+size>=N?N-1:x+size;
+					
+					for(int nx=startX;nx<=endX;nx++) seeTemp[nx][y]=false;
+					
+					x+=deltas[3][0];
+					y+=deltas[3][1];
+					size+=1;
+				}
+			}
+		}
+		
+		
+		for(int m=0;m<M;m++) {
+			if(warriors[m].isRemoved) continue;
+			if(seeTemp[warriors[m].x][warriors[m].y]) {
 				cnt++;
 			}
 		}
 		
 		if(cnt>maxCnt) {
 			for(int r=0;r<N;r++) {
-				for(int c=0;c<N;c++) see[r][c]=seeDown[r][c];
+				for(int c=0;c<N;c++) see[r][c]=seeTemp[r][c];
 			}
 			maxCnt=cnt;
 		}
@@ -263,25 +298,13 @@ public class Main {
 		int y=house[1]+deltas[2][1];
 		int size=3;
 		int cnt=0;
-		boolean[][] seeDown=new boolean[N][N];
+		boolean[][] seeTemp=new boolean[N][N];
 		
 		while(y>=0) {
 			startX=x-(size/2)<0?0:x-(size/2);
 			endX=x+(size/2)>=N?N-1:x+(size/2);
 			
-			for(int nx=startX;nx<=endX;nx++) {
-				if(nx>=x-1&&nx<=x+1) {
-					if(size==3) seeDown[nx][y]=true;
-					else if(mapWarrior[nx][y+1]||!seeDown[nx][y+1]) seeDown[nx][y]=false;
-					else seeDown[nx][y]=true;
-				} else if(nx<x-1) {
-					if(mapWarrior[nx][y+1]||mapWarrior[nx+1][y+1]||!seeDown[nx][y+1]||!seeDown[nx+1][y+1]) seeDown[nx][y]=false;
-					else seeDown[nx][y]=true;
-				} else if(nx>x+1) {
-					if(mapWarrior[nx][y+1]||mapWarrior[nx-1][y+1]||!seeDown[nx][y+1]||!seeDown[nx-1][y+1]) seeDown[nx][y]=false;
-					else seeDown[nx][y]=true;
-				}
-			}
+			for(int nx=startX;nx<=endX;nx++) seeTemp[nx][y]=true;
 			
 			x+=deltas[2][0];
 			y+=deltas[2][1];
@@ -290,14 +313,60 @@ public class Main {
 		
 		for(int m=0;m<M;m++) {
 			if(warriors[m].isRemoved) continue;
-			if(seeDown[warriors[m].x][warriors[m].y]) {
+			if(!seeTemp[warriors[m].x][warriors[m].y]) continue;
+			
+			x=warriors[m].x+deltas[2][0];
+			y=warriors[m].y+deltas[2][1];
+			size=1;
+			
+			// 가운데 
+			if(warriors[m].x==house[0]) {	
+				while(y>=0) {
+					seeTemp[x][y]=false;
+					x+=deltas[2][0];
+					y+=deltas[2][1];
+				}
+			}
+			
+			// 위
+			else if(warriors[m].x<house[0]) {	
+				while(y>=0) {
+					startX=x-size<0?0:x-size;
+					endX=warriors[m].x;
+					
+					for(int nx=startX;nx<=endX;nx++) seeTemp[nx][y]=false;
+					
+					x+=deltas[2][0];
+					y+=deltas[2][1];
+					size+=1;
+				}
+			}
+			
+			// 아래 
+			else if(warriors[m].x>house[0]) {	
+				while(y>=0) {
+					startX=warriors[m].x;
+					endX=x+size>=N?N-1:x+size;
+					
+					for(int nx=startX;nx<=endX;nx++) seeTemp[nx][y]=false;
+					
+					x+=deltas[2][0];
+					y+=deltas[2][1];
+					size+=1;
+				}
+			}
+		}
+		
+		for(int m=0;m<M;m++) {
+			if(warriors[m].isRemoved) continue;
+			if(seeTemp[warriors[m].x][warriors[m].y]) {
 				cnt++;
 			}
 		}
 		
 		if(cnt>maxCnt) {
 			for(int r=0;r<N;r++) {
-				for(int c=0;c<N;c++) see[r][c]=seeDown[r][c];
+				for(int c=0;c<N;c++) see[r][c]=seeTemp[r][c];
 			}
 			maxCnt=cnt;
 		}	
@@ -310,25 +379,13 @@ public class Main {
 		int y=house[1]+deltas[0][1];
 		int size=3;
 		int cnt=0;
-		boolean[][] seeDown=new boolean[N][N];
+		boolean[][] seeTemp=new boolean[N][N];
 		
 		while(x>=0) {
 			startY=y-(size/2)<0?0:y-(size/2);
 			endY=y+(size/2)>=N?N-1:y+(size/2);
 			
-			for(int ny=startY;ny<=endY;ny++) {
-				if(ny>=y-1&&ny<=y+1) {
-					if(size==3) seeDown[x][ny]=true;
-					else if(mapWarrior[x+1][ny]||!seeDown[x+1][ny]) seeDown[x][ny]=false;
-					else seeDown[x][ny]=true;
-				} else if(ny<y-1) {
-					if(mapWarrior[x+1][ny]||mapWarrior[x+1][ny+1]||!seeDown[x+1][y]||!seeDown[x+1][ny+1]) seeDown[x][ny]=false;
-					else seeDown[x][ny]=true;
-				} else if(ny>y+1) {
-					if(mapWarrior[x+1][ny]||mapWarrior[x+1][ny-1]||!seeDown[x+1][y]||!seeDown[x+1][ny-1]) seeDown[x][ny]=false;
-					else seeDown[x][ny]=true;
-				}
-			}
+			for(int ny=startY;ny<=endY;ny++) seeTemp[x][ny]=true;
 			
 			x+=deltas[0][0];
 			y+=deltas[0][1];
@@ -337,14 +394,59 @@ public class Main {
 		
 		for(int m=0;m<M;m++) {
 			if(warriors[m].isRemoved) continue;
-			if(seeDown[warriors[m].x][warriors[m].y]) {
+			if(!seeTemp[warriors[m].x][warriors[m].y]) continue;
+			
+			x=warriors[m].x+deltas[0][0];
+			y=warriors[m].y+deltas[0][1];
+			size=1;
+			
+			// 가운데 
+			if(warriors[m].y==house[1]) {	
+				while(x>=0) {
+					seeTemp[x][y]=false;
+					x+=deltas[0][0];
+					y+=deltas[0][1];
+				}
+			}
+			
+			// 왼쪽
+			else if(warriors[m].y<house[1]) {	
+				while(x>=0) {
+					startY=y-size<0?0:y-size;
+					endY=warriors[m].y;
+					
+					for(int ny=startY;ny<=endY;ny++) seeTemp[x][ny]=false;
+					
+					x+=deltas[0][0];
+					y+=deltas[0][1];
+					size+=1;
+				}
+			}
+			
+			// 오른쪽
+			else if(warriors[m].y>house[1]) {	
+				while(x>=0) {
+					startY=warriors[m].y;
+					endY=y+size>=N?N-1:y+size;
+					for(int ny=startY;ny<=endY;ny++) seeTemp[x][ny]=false;
+					
+					x+=deltas[0][0];
+					y+=deltas[0][1];
+					size+=1;
+				}
+			}
+		}
+		
+		for(int m=0;m<M;m++) {
+			if(warriors[m].isRemoved) continue;
+			if(seeTemp[warriors[m].x][warriors[m].y]) {
 				cnt++;
 			}
 		}
 		
 		if(cnt>maxCnt) {
 			for(int r=0;r<N;r++) {
-				for(int c=0;c<N;c++) see[r][c]=seeDown[r][c];
+				for(int c=0;c<N;c++) see[r][c]=seeTemp[r][c];
 			}
 			maxCnt=cnt;
 		}
@@ -358,25 +460,13 @@ public class Main {
 		int y=house[1]+deltas[1][1];
 		int size=3;
 		int cnt=0;
-		boolean[][] seeDown=new boolean[N][N];
+		boolean[][] seeTemp=new boolean[N][N];
 		
 		while(x<N) {
 			startY=y-(size/2)<0?0:y-(size/2);
 			endY=y+(size/2)>=N?N-1:y+(size/2);
 			
-			for(int ny=startY;ny<=endY;ny++) {
-				if(ny>=y-1&&ny<=y+1) {
-					if(size==3) seeDown[x][ny]=true;
-					else if(mapWarrior[x-1][ny]||!seeDown[x-1][ny]) seeDown[x][ny]=false;
-					else seeDown[x][ny]=true;
-				} else if(ny<y-1) {
-					if(mapWarrior[x-1][ny]||mapWarrior[x-1][ny+1]||!seeDown[x-1][y]||!seeDown[x-1][ny+1]) seeDown[x][ny]=false;
-					else seeDown[x][ny]=true;
-				} else if(ny>y+1) {
-					if(mapWarrior[x-1][ny]||mapWarrior[x-1][ny-1]||!seeDown[x-1][y]||!seeDown[x-1][ny-1]) seeDown[x][ny]=false;
-					else seeDown[x][ny]=true;
-				}
-			}
+			for(int ny=startY;ny<=endY;ny++) seeTemp[x][ny]=true;
 			
 			x+=deltas[1][0];
 			y+=deltas[1][1];
@@ -385,14 +475,61 @@ public class Main {
 		
 		for(int m=0;m<M;m++) {
 			if(warriors[m].isRemoved) continue;
-			if(seeDown[warriors[m].x][warriors[m].y]) {
+			if(!seeTemp[warriors[m].x][warriors[m].y]) continue;
+			
+			x=warriors[m].x+deltas[1][0];
+			y=warriors[m].y+deltas[1][1];
+			size=1;
+			
+			// 가운데 
+			if(warriors[m].y==house[1]) {	
+				while(x<N) {
+					seeTemp[x][y]=false;
+					x+=deltas[1][0];
+					y+=deltas[1][1];
+				}
+			}
+			
+			// 왼쪽
+			else if(warriors[m].y<house[1]) {	
+				while(x<N) {
+				
+					startY=y-size<0?0:y-size;
+					endY=warriors[m].y;
+					
+					for(int ny=startY;ny<=endY;ny++) seeTemp[x][ny]=false;
+					
+					x+=deltas[1][0];
+					y+=deltas[1][1];
+					size+=1;
+				}
+			}
+			
+			// 오른쪽
+			else if(warriors[m].y>house[1]) {	
+				while(x<N) {
+				
+					startY=warriors[m].y;
+					endY=y+size>=N?N-1:y+size;
+					for(int ny=startY;ny<=endY;ny++) seeTemp[x][ny]=false;
+					
+					x+=deltas[1][0];
+					y+=deltas[1][1];
+					size+=1;
+				}
+			}
+		}
+		
+		for(int m=0;m<M;m++) {
+			if(warriors[m].isRemoved) continue;
+			if(seeTemp[warriors[m].x][warriors[m].y]) {
 				cnt++;
 			}
 		}
 		
 		if(cnt>maxCnt) {
 			for(int r=0;r<N;r++) {
-				for(int c=0;c<N;c++) see[r][c]=seeDown[r][c];
+				for(int c=0;c<N;c++) see[r][c]=seeTemp[r][c];
 			}
 			maxCnt=cnt;
 		}
