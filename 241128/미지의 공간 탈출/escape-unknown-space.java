@@ -38,27 +38,21 @@ public class Main {
 		F=Integer.parseInt(tokens.nextToken());
 		
 		map=new int[N][N];
-		timeMap=new int[3*M][3*M];
+		timeMap=new int[3*M][3*M]; // 시간의 벽 정육면체 전개도 
 		for(int r=0;r<3*M;r++) Arrays.fill(timeMap[r],-1);
-		startTimeMap=new int[]{-1,-1};
-		finish=new int[2];
-		effect=new Effect[F];
-		gate=new int[2];
-		start=new int[2];
-		ans=-1;
+		startTimeMap=new int[]{-1,-1}; // 미지의 공간에서 시간의 벽이 시작하는 위치(3의 첫번째 위치) 
+		effect=new Effect[F]; // 이상현상 정보 
+		gate=new int[2]; // 미지의 공간과 시간의 벽이 이어지는 출구 위치 
+		start=new int[2]; // 타임머신 위치 
+		ans=-1; // 답 
 		
 		for(int r=0;r<N;r++) {
 			tokens=new StringTokenizer(input.readLine());
 			for(int c=0;c<N;c++) {
 				map[r][c]=Integer.parseInt(tokens.nextToken());
-				// 출구 위치 
-				if(map[r][c]==4) {
-					finish[0]=r;
-					finish[1]=c;
-				} 
 				
 				// 시간의 벽 시작 위치 
-				else if(map[r][c]==3&&startTimeMap[0]==-1) {
+				if(map[r][c]==3&&startTimeMap[0]==-1) {
 					startTimeMap[0]=r;
 					startTimeMap[1]=c;
 				}
@@ -71,11 +65,14 @@ public class Main {
 				for(int c=0;c<M;c++) {
 					int n=Integer.parseInt(tokens.nextToken());
 					
+					// 타임머신 위치 초기화 
 					if(n==2) {
 						start[0]=M+r;
 						start[1]=M+c;
 					}
 					
+					// 시간의 벽 정육면체 전개도 초기화
+					// 동, 서, 남, 북에 따라 전처리 
 					if(z==0) { // 동 
 						timeMap[2*M-1-c][2*M+r]=n;
 					} else if(z==1) { // 서 
@@ -98,19 +95,13 @@ public class Main {
 			int dir=Integer.parseInt(tokens.nextToken());
 			int v=Integer.parseInt(tokens.nextToken());
 			effect[f]=new Effect(x,y,dir,v);
-//			map[x][y]=1;
 		}
 		
 		// 시간의 벽과 미지의 공간 바닫으로 이어진 출구 찾고 timeMap에 셋팅 
 		findGate();
-		
-//		for(int r=0;r<3*M;r++) {
-//			System.out.println(Arrays.toString(timeMap[r]));
-//		}
-		
+
 		// 시간의 벽에서 탈출 
 		int time=exitTimeMap();
-//		System.out.print(time);
 		
 		// 시간의 벽 탈출까지 확산된 이상현상 계산
 		for(int f=0;f<F;f++) {
@@ -118,19 +109,10 @@ public class Main {
 				effect(effect[f]);
 			}
 		}
-
-//		for(int r=0;r<N;r++) {
-//			System.out.println(Arrays.toString(map[r]));
-//		}
 		
 		// 미지의 공간에서 이동 
 		exitMap(time);
-		
-//		for(int r=0;r<N;r++) {
-//			System.out.println(Arrays.toString(map[r]));
-//		}
-		
-		
+
 		output.append(ans);
 		System.out.print(output);
 	}
@@ -144,9 +126,7 @@ public class Main {
 		
 		while(q.size()>0) {
 			int[] now=q.poll();
-			
-//			System.out.println(now[2]);
-			
+
 			// 이상 현상 확산 
 			for(int f=0;f<F;f++) {
 				if(effect[f].nowV==now[2]) {
@@ -165,7 +145,7 @@ public class Main {
 				if(map[nx][ny]==0&&!visited[nx][ny]) {
 					q.add(new int[] {nx,ny,now[2]+1});
 					visited[nx][ny]=true;
-				} else {
+				} else { // 탈출구 도착 시 종료 
 					if(map[nx][ny]==4) {
 						ans=now[2]+1;
 						return;
@@ -176,11 +156,14 @@ public class Main {
 	}
 
 	private static void effect(Effect effect) {
+		
+		// 초기 확산을 위해 코드 추가 
+		// V초에는 이상현상의 초기 위치와 방향에 따른 다음 위치, 총 2개의 위치에 이상현상이 확산된다. 
 		map[effect.x][effect.y]=1;
 		
 		int nx=effect.x+deltas[effect.dir][0];
 		int ny=effect.y+deltas[effect.dir][1];
-		
+	
 		effect.nowV+=effect.v;
 		
 		if(nx<0||nx>=N||ny<0||ny>=N) return;
@@ -203,6 +186,7 @@ public class Main {
 		while(q.size()>0) {
 			int[] now=q.poll();
 			
+			// 시간의 벽과 미지의 공간이 이어지는 출구 도착 시 종료 
 			if(timeMap[now[0]][now[1]]==3) {
 				return now[2];
 			}
@@ -211,10 +195,9 @@ public class Main {
 				int nx=now[0]+deltas[d][0];
 				int ny=now[1]+deltas[d][1];
 				
-//				System.out.print(nx+" "+ny);
 				if(nx<0||nx>=3*M||ny<0||ny>=3*M) continue;
 				
-//				if((nx>=0&&nx<=M-1&&ny>=0&&ny<=M-1)||(nx>=2*M&&nx<=3*M-1&&ny>=0&&ny<=M-1)||(nx>=0&&nx<=M-1&&ny>=2*M&&ny<=3*M-1)||(nx>=2*M&&nx<=3*M-1&&ny>=2*M&&ny<=3*M-1)) continue;
+				// 시간의 벽 정육면체 전개도에서 넘어갈 때 방향에 따라 아래와 같이 다음 위치가 수정된다. 
 				if(nx>=0&&nx<=M-1&&ny>=0&&ny<=M-1) {
 					if(d==1) {
 						ny=nx;
@@ -248,12 +231,10 @@ public class Main {
 						ny=2*M-1;
 					}
 				}
-//				System.out.println(" "+nx+" "+ny);
 				
 				if(!visited[nx][ny]&&(timeMap[nx][ny]==0||timeMap[nx][ny]==3)) {
 					q.add(new int[] {nx, ny, now[2]+1});
 					visited[nx][ny]=true;
-//					System.out.println(" "+nx+" "+ny+" "+timeMap[nx][ny]);
 				}
 			}
 		}
@@ -280,7 +261,11 @@ public class Main {
 					visited[nx][ny]=true;
 				} else if(map[nx][ny]==0&&!visited[nx][ny]) {
 					
+					// 미지의 공간과 시간의 벽 사이의 출구 
 					gate[0]=nx; gate[1]=ny;
+					
+					// 출구의 위치에 따라 시간의 벽 정육면체 전개도에 위치할 gate 전처리
+					// 시간의 벽 정육면체 전개도에서 gate는 3으로 표시된다. 즉, 시간의 벽에서는 2->3으로 도달하는 최단 거리를 구하면 된다. 
 					if(d==0) { // 동
 						timeMap[M+(gate[0]-startTimeMap[0])][3*M-1]=3;
 					} else if(d==1) { // 서 
