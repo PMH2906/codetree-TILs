@@ -76,9 +76,6 @@ public class Main {
 			// 골렘을 map에 셋팅 
 			setMap(k);
 			
-//			for(int r=0;r<R;r++) System.out.println(Arrays.toString(map[r]));
-//			System.out.println();
-			
 			// 정령 이동
 			moveGod();
 		}
@@ -86,6 +83,10 @@ public class Main {
 		output.append(ans);
 		System.out.println(ans);
 	}
+	
+	/**
+	 * 정렬 움직이는 함수 
+	 * **/
 	private static void moveGod() {
 		
 		Queue<int[]> q=new LinkedList<>();
@@ -106,10 +107,13 @@ public class Main {
 				
 				if(nx<0||nx>=R||ny<0||ny>=C) continue;
 				
+				// 출구가 아닌 골렘, 출구가 아닌 골렘은 같은 번호의 골렘으로만 움직일 수 있음, 출구도 포함해야하므로 절대값 사용 
 				if(map[now[0]][now[1]]>0&&Math.abs(map[now[0]][now[1]])==Math.abs(map[nx][ny])&&!visited[nx][ny]) {
 					q.add(new int[] {nx,ny});
 					visited[nx][ny]=true;
-				} else if(map[now[0]][now[1]]<0&&!visited[nx][ny]&&map[nx][ny]!=0){
+				} 
+				// 출구 골렘, 출구 골렘은 0이 아닌 모든 위치의 골렘을 움직일 수 있음. 
+				else if(map[now[0]][now[1]]<0&&!visited[nx][ny]&&map[nx][ny]!=0){
 					q.add(new int[] {nx,ny});
 					visited[nx][ny]=true;
 				}
@@ -117,8 +121,11 @@ public class Main {
 		}
 		
 		ans+=maxRow+1;
-//		System.out.println(maxRow+1);
 	}
+	
+	/**
+	 * 골렘 번호 셋팅, 출구는 골렘 번호 * -1로 셋팅 
+	 * **/
 	private static void setMap(int num) {
 		
 		map[monster.x][monster.y]=num;
@@ -132,6 +139,10 @@ public class Main {
 			else map[nx][ny]=num;
 		}
 	}
+	
+	/**
+	 * 골렘이 움직일 수 있는지 확인하는 함수 
+	 * **/
 	private static boolean check(int x, int y, int[] checkDir) {
 		
 		for(int dir : checkDir) {
