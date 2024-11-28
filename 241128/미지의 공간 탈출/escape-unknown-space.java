@@ -26,7 +26,7 @@ public class Main {
 			this.y = y;
 			this.dir = dir;
 			this.v = v;
-			this.nowV=nowV;
+			this.nowV=v;
 		}
 	}
 	
@@ -98,7 +98,7 @@ public class Main {
 			int dir=Integer.parseInt(tokens.nextToken());
 			int v=Integer.parseInt(tokens.nextToken());
 			effect[f]=new Effect(x,y,dir,v);
-			map[x][y]=1;
+//			map[x][y]=1;
 		}
 		
 		// 시간의 벽과 미지의 공간 바닫으로 이어진 출구 찾고 timeMap에 셋팅 
@@ -176,6 +176,8 @@ public class Main {
 	}
 
 	private static void effect(Effect effect) {
+		map[effect.x][effect.y]=1;
+		
 		int nx=effect.x+deltas[effect.dir][0];
 		int ny=effect.y+deltas[effect.dir][1];
 		
