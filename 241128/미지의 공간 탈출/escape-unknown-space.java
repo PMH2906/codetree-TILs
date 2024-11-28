@@ -110,6 +110,7 @@ public class Main {
 		
 		// 시간의 벽에서 탈출 
 		int time=exitTimeMap();
+//		System.out.print(time);
 		
 		// 시간의 벽 탈출까지 확산된 이상현상 계산
 		for(int f=0;f<F;f++) {
@@ -181,7 +182,7 @@ public class Main {
 		effect.nowV+=effect.v;
 		
 		if(nx<0||nx>=N||ny<0||ny>=N) return;
-		if(map[nx][ny]==1) return;
+		if(map[nx][ny]==1||map[nx][ny]==4) return;
 		
 		// 확산 
 		map[nx][ny]=1;
