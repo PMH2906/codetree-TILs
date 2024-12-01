@@ -71,10 +71,7 @@ public class Main {
 			
 			// 기사 이동 
 			if(!peoples[num].out) movePeople(num, dir);
-			
-//			for(int r=0;r<L;r++) System.out.println(Arrays.toString(numMap[r]));
-//			System.out.println();
-			
+	
 			for(int n=1;n<=N;n++) {
 				if(peoples[n].out) continue;
 				peoples[n].newPoint.clear();
@@ -89,21 +86,24 @@ public class Main {
 	}
 	private static void movePeople(int num, int dir) {
 		
+		// 움직인 기사가 위치에 다른 기사가 있을 경우, 번호를 저장하는 Q 
 		Queue<Integer> q=new LinkedList<>();
+		// 움직인 기사 위치에 있는 다른 기사의 번호를 한 번만 Q에 넣기위해 boolean 배열 선언 
 		visited=new boolean[N+1];
 		visited[num]=true;
 		
 		// 명령 받은 기사 움직임 
 		for(int[] point:peoples[num].point) {
-			//System.out.println(point[0]+" "+point[1]+" "+num);
 			int nx=point[0]+deltas[dir][0];
 			int ny=point[1]+deltas[dir][1];
 			
+			// 벽이면 함수 종료 
 			if(nx<0||nx>=L||ny<0||ny>=L) return;
 			if(map[nx][ny]==2) return;
 			
-			// System.out.println(nx+" "+ny+" "+num);
 			peoples[num].newPoint.add(new int[] {nx,ny});
+			
+			// 움직인 기사 위치에 다른 기사 있을 경우에 Q에 한번도 안 들어갔다면 넣어주고 visited true해주기 
 			if(numMap[nx][ny]>0&&!visited[numMap[nx][ny]]) {
 				visited[numMap[nx][ny]]=true;
 				q.add(numMap[nx][ny]);
@@ -115,7 +115,7 @@ public class Main {
 		while(q.size()>0) {
 			
 			int nextNum=q.poll();
-			// 명령 받은 기사 움직임 
+			
 			for(int[] point:peoples[nextNum].point) {
 				int nx=point[0]+deltas[dir][0];
 				int ny=point[1]+deltas[dir][1];
@@ -123,9 +123,9 @@ public class Main {
 				if(nx<0||nx>=L||ny<0||ny>=L) return;
 				if(map[nx][ny]==2) return;
 				
-				//System.out.println(nx+" "+ny+" "+nextNum);
-				
 				peoples[nextNum].newPoint.add(new int[] {nx,ny});
+				
+				// 움직인 기사 위치에 다른 기사 있을 경우에 Q에 한번도 안 들어갔다면 넣어주고 visited true해주기  
 				if(numMap[nx][ny]>0&&!visited[numMap[nx][ny]]) {
 					visited[numMap[nx][ny]]=true;
 					q.add(numMap[nx][ny]);
@@ -134,17 +134,20 @@ public class Main {
 			}
 		}
 		
+		// numMap 업데이트 및 peoples.point 업데이트 
 		numMap=new int[L][L];
-		// 모든 기사들이 벽으로 안 밀려나면 numMap 업데이트 및 peoples.point 업데이트 
 		loop:for(int n=1;n<=N;n++) {
 			if(peoples[n].out) continue;
 			
 			int damage=0;
 			for(int i=0;i<peoples[n].point.size();i++) {
+				// 안 움직인 기사는 원본 위치를 기준으로 numMap 초기화 
 				if(peoples[n].newPoint.isEmpty()) {
 					int[] now=peoples[n].point.get(i);
 					numMap[now[0]][now[1]]=n;
 				}
+				// 움직인 기사는 새로운 위치를 기준으로 numMap 초기화 
+				// damage 계산 
 				else {
 					int[] next=peoples[n].newPoint.get(i);
 					numMap[next[0]][next[1]]=n;
@@ -152,12 +155,13 @@ public class Main {
 				}
 			}
 			
-			// num은 대미지 안 받음 
+			// 현재 명령을 받은 기사 제외 & 대미지 안 받은 기사 제외 
 			if(n!=num&&damage!=0) {
 				peoples[n].damage+=damage;
+				// 현재 체력 이상의 대미지를 받을 경우 기사는 체스판에서 사라지게 됩니다. 
 				if(peoples[n].k-peoples[n].damage<=0) {
 					peoples[n].out=true; 
-					// 데미지 받은 기사는 체스판에서 사라짐 
+					// 데미지 받고 아웃된 기사는 체스판에서 사라짐 
 					for(int i=0;i<peoples[n].point.size();i++) {
 						int[] next=peoples[n].newPoint.get(i);
 						numMap[next[0]][next[1]]=0;
@@ -166,6 +170,7 @@ public class Main {
 				}
 			}
 			
+			// 새로운 위치를 원본 위치로 초기화 
 			if(!peoples[n].newPoint.isEmpty()) {
 				peoples[n].point.clear();
 				peoples[n].point.addAll(peoples[n].newPoint);
