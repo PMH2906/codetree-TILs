@@ -40,6 +40,7 @@ public class Main {
 		}
 	}
 	
+	// 루돌프가 택할 산타 정보 
 	public static class Info implements Comparable<Info> {
 		Santa santa;
 		int dist;
@@ -97,17 +98,11 @@ public class Main {
 			// 루돌프 움직임
 			moveRoudolph();
 			
-//			for(int r=0;r<N;r++) System.out.println(Arrays.toString(map[r]));
-//			System.out.println();
-			
 			// 산타가 모두 게임에서 탈락하게 된다면 그 즉시 게임이 종료
 			if(removedSanta==0) break;
 			
 			// 산타 움직임
 			moveSanta();
-			
-//			for(int r=0;r<N;r++) System.out.println(Arrays.toString(map[r]));
-//			System.out.println();
 			
 			// 산타가 모두 게임에서 탈락하게 된다면 그 즉시 게임이 종료
 			if(removedSanta==0) break;
@@ -138,13 +133,13 @@ public class Main {
 				int nx=santas[p].x+deltas[d][0];
 				int ny=santas[p].y+deltas[d][1];
 				
-				// 산타는 루돌프에게 거리가 가장 가까워지는 방향으로 1칸 이동합니다.
 				// 산타는 다른 산타가 있는 칸이나 게임판 밖으로는 움직일 수 없습니다.
 				if(nx<0||nx>=N||ny<0||ny>=N) continue;
 				if(map[nx][ny]>0) continue;
 				
 				int dist=(nx-roudolph.x)*(nx-roudolph.x)+(ny-roudolph.y)*(ny-roudolph.y);
 				
+				// 산타는 루돌프에게 거리가 가장 가까워지는 방향으로 1칸 이동합니다.
 				if(dist<minDist) {
 					minDist=dist;
 					dir=d;
@@ -154,7 +149,9 @@ public class Main {
 			//움직일 수 있는 칸이 있더라도 만약 루돌프로부터 가까워질 수 있는 방법이 없다면 산타는 움직이지 않습니다.
 			if(dir==-1) continue;
 			
+			// 원래 산타있는 위치를 0으로 셋팅 
 			map[santas[p].x][santas[p].y]=0;
+			// 산타 정보 업데이트 
 			santas[p].x+=deltas[dir][0];
 			santas[p].y+=deltas[dir][1];
 			santas[p].dir=dir;
@@ -164,6 +161,7 @@ public class Main {
 			if(map[santas[p].x][santas[p].y]<0) {
 				attack(santas[p], (dir+2)%4, D);
 			}
+			// 루돌프가 존재하지 않으면 map을 산타 번호로 셋팅 
 			else map[santas[p].x][santas[p].y]=santas[p].num;
 		}
 		
@@ -196,6 +194,7 @@ public class Main {
 			}
 		}
 		
+		// 루돌프 정보 업데이트 
 		map[roudolph.x][roudolph.y]=0;
 		roudolph.x+=deltas[dir][0];
 		roudolph.y+=deltas[dir][1];
@@ -205,15 +204,18 @@ public class Main {
 		if(map[roudolph.x][roudolph.y]>0) {
 			attack(santas[map[roudolph.x][roudolph.y]], dir, C);
 		}
+		// 충돌 및 상호작용한 모든 산타 번호를 map에 셋팅한 후 루돌프를 마지막으로 map을 셋팅.
 		map[roudolph.x][roudolph.y]=-1;
 	}
 
 	private static void attack(Santa santa, int dir, int score) {
-		// map[santa.x][santa.y]=0;
+		
+		// 충돌한 후 산타 정보 업데이트 -> 튕겨진 곳으로 업데이트 
 		santa.x+=deltas[dir][0]*score;
 		santa.y+=deltas[dir][1]*score;
 		santa.score+=score;
 		santa.dir=dir;
+		// 기절. 산타가 움직일 수 있는 턴으로 셋팅 
 		santa.stopTern=tern+1;
 		
 		// 산타 제거 
@@ -228,11 +230,14 @@ public class Main {
 			// 상호작용 
 			effect(santas[map[santa.x][santa.y]], santa.dir);
 		}
+		// 상호작용한 모든 산타 번호를 map에 셋팅한 후 충돌한 산타 번호를 마지막으로 map에 셋팅.
 		map[santa.x][santa.y]=santa.num;
 	}
 
 	private static void effect(Santa santa, int dir) {
+		// 상호작용할 산타의 전 위치를 0으로 셋팅 
 		map[santa.x][santa.y]=0;
+		// 상호작용한 후 다음 위치로 산타 정보 업데이트 
 		santa.x+=deltas[dir][0];
 		santa.y+=deltas[dir][1];
 		santa.dir=dir;
@@ -249,6 +254,7 @@ public class Main {
 			// 상호작용 
 			effect(santas[map[santa.x][santa.y]], santa.dir);
 		}
+		// 마지막 상호 작용으로 움직인 산타 정보를 가장 첫번째로 map에 업데이트. 가장 첫번째로 상호작용한 산타를 마지막으로 map에 업데이트 해주는 구조!!!!!! 
 		map[santa.x][santa.y]=santa.num;
 	}
 }
