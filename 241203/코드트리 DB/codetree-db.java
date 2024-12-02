@@ -110,7 +110,7 @@ public class Main {
 
 	private static String rank(int rank) {
 		
-		if(segmentTree.get(1).count<rank) return "NONE";
+		if(segmentTree.get(1).count<rank) return "None";
 		int rankIndex=queryRank(1, 1, INF, rank);
 		String rankName=names[rankIndex];
 		return rankName;
