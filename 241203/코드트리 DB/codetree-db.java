@@ -144,7 +144,7 @@ public class Main {
 		// 세그먼트 트리에서 삭제 
 		// sum과 count를 0으로 셋팅하면 해당 값은 0으로 되며, 부모 노드도 0으로 업데이트된 값을 기준으로 업데이트됨  
 		update(1,1,INF,deleteValue,index,0,0);
-		return 0;
+		return deleteValue;
 	}
 
 	private static int insert(String name, int value) {
