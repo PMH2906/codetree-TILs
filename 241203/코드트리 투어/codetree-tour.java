@@ -91,8 +91,8 @@ public class Main {
 				output.append(sale()+"\n");
 			} 
 			else if(order==500) {
-				int s=Integer.parseInt(tokens.nextToken());
-				dijkstra(s);
+				start=Integer.parseInt(tokens.nextToken());
+				dijkstra(start);
 			}
 		}
 		System.out.println(output);
@@ -111,6 +111,9 @@ public class Main {
 			if(maxValue<revenue-cost) {
 				maxValue=revenue-cost;
 				maxId=id;
+			} else if(maxValue==revenue-cost&&maxId>id) {
+				maxValue=revenue-cost;
+				maxId=id;
 			}
 		}
 		
@@ -120,7 +123,7 @@ public class Main {
 	}
 
 	private static void dijkstra(int start) {
-		minDist=new int[N+1];
+		minDist=new int[N];
 		Arrays.fill(minDist, Integer.MAX_VALUE);
 		minDist[start]=0;
 		
