@@ -4,12 +4,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -17,7 +14,7 @@ public class Main {
 	static StringBuilder output=new StringBuilder();
 	static StringTokenizer tokens;
 	static Map<Integer, Product> products;
-	static PriorityQueue<Product> pq;
+	static PriorityQueue<Product> pq; // 최적의 여행 상품 판매를 바로 뽑기위해 우선순위 큐 생성 
 	static int[] minDist;
 	static int Q, N, M,start;
 	static List<Node>[] nodes;
@@ -100,15 +97,21 @@ public class Main {
 				int cost=minDist[dest];
 				
 				products.put(id, new Product(id, revenue, dest));
+				
+				// 새로운 상품 생성할 때마다 pq 추가 -> O(log n)
 				if(revenue>=cost) pq.add(new Product(id, revenue, dest, revenue-cost));
 			} 
 			else if(order==300) {
 				int id=Integer.parseInt(tokens.nextToken());
 				products.remove(id);
 			} 
+			
+			// 최적의 여행 상품 판매는 최대 30,000번 주어지므로 pq를 이용해 한 번에 빼기 
 			else if(order==400) {
 				output.append(sale()+"\n");
 			} 
+			
+			// 출발지 변경은 최대 15번 이므로 다익스트라와 pq 리셋을 진행해도 됨 
 			else if(order==500) {
 				start=Integer.parseInt(tokens.nextToken());
 				dijkstra(start);
@@ -118,6 +121,7 @@ public class Main {
 		System.out.println(output);
 	}
 
+	// 최적의 여행 상품 판매를 위한 pq 리셋 
 	private static void reset() {
 		pq=new PriorityQueue<>();
 		
@@ -130,31 +134,13 @@ public class Main {
 		}
 	}
 
-	private static Object sale() {
-//		int maxValue=Integer.MIN_VALUE;
-//		int maxId=-1;
-//		for(Integer id:products.keySet()) {
-//			int revenue=products.get(id).revenue;
-//			int dest=products.get(id).dest;
-//			int cost=minDist[dest];
-//			
-//			if(cost==Integer.MAX_VALUE) continue;
-//			if(revenue<cost) continue;
-//			if(maxValue<revenue-cost) {
-//				maxValue=revenue-cost;
-//				maxId=id;
-//			} else if(maxValue==revenue-cost&&maxId>id) {
-//				maxValue=revenue-cost;
-//				maxId=id;
-//			}
-//		}
-//		
-//		if(maxId==-1) return -1;
-//		products.remove(maxId);
+	private static int sale() {
 		
 		while(pq.size()>0) {
+			// 최적의 여행 상품 판매 -> O(log n)
 			Product selectProduct=pq.poll();
 			
+			// 제거된 상품 id는 패스 
 			if(!products.containsKey(selectProduct.id)) continue;
 			
 			products.remove(selectProduct.id);
@@ -164,6 +150,7 @@ public class Main {
 		return -1;
 	}
 
+	// 다익스트라 시간 복잡도 EO(logV)
 	private static void dijkstra(int start) {
 		minDist=new int[N];
 		Arrays.fill(minDist, Integer.MAX_VALUE);
