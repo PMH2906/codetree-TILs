@@ -17,6 +17,7 @@ public class Main {
 	static StringBuilder output=new StringBuilder();
 	static StringTokenizer tokens;
 	static Map<Integer, Product> products;
+	static PriorityQueue<Product> pq;
 	static int[] minDist;
 	static int Q, N, M,start;
 	static List<Node>[] nodes;
@@ -37,13 +38,28 @@ public class Main {
 		
 	}
 	
-	public static class Product {
-		int revenue, dest;
+	public static class Product implements Comparable<Product>{
+		int id, revenue, dest,value;
 
-		public Product(int revenue, int dest) {
+		public Product(int id, int revenue, int dest) {
 			super();
+			this.id=id;
 			this.revenue = revenue;
 			this.dest = dest;
+		}
+		public Product(int id, int revenue, int dest, int value) {
+			super();
+			this.id=id;
+			this.revenue = revenue;
+			this.dest = dest;
+			this.value=value;
+		}
+		@Override
+		public int compareTo(Product o) {
+			if(this.value==o.value) {
+				return Integer.compare(this.id, o.id);
+			}
+			return Integer.compare(this.value, o.value)*-1;
 		}
 	}
 	
@@ -63,6 +79,7 @@ public class Main {
 				minDist=new int[N];
 				nodes=new ArrayList[N];
 				products=new HashMap<>();
+				pq=new PriorityQueue<>();
 				for(int n=0;n<N;n++) {
 					nodes[n]=new ArrayList<>();
 				}
@@ -80,8 +97,10 @@ public class Main {
 				int id=Integer.parseInt(tokens.nextToken());
 				int revenue=Integer.parseInt(tokens.nextToken());
 				int dest=Integer.parseInt(tokens.nextToken());
+				int cost=minDist[dest];
 				
-				products.put(id, new Product(revenue, dest));
+				products.put(id, new Product(id, revenue, dest));
+				if(revenue>=cost) pq.add(new Product(id, revenue, dest, revenue-cost));
 			} 
 			else if(order==300) {
 				int id=Integer.parseInt(tokens.nextToken());
@@ -93,33 +112,56 @@ public class Main {
 			else if(order==500) {
 				start=Integer.parseInt(tokens.nextToken());
 				dijkstra(start);
+				reset();
 			}
 		}
 		System.out.println(output);
 	}
 
-	private static Object sale() {
-		int maxValue=Integer.MIN_VALUE;
-		int maxId=-1;
+	private static void reset() {
+		pq=new PriorityQueue<>();
+		
 		for(Integer id:products.keySet()) {
 			int revenue=products.get(id).revenue;
 			int dest=products.get(id).dest;
 			int cost=minDist[dest];
 			
-			if(cost==Integer.MAX_VALUE) continue;
-			if(revenue<cost) continue;
-			if(maxValue<revenue-cost) {
-				maxValue=revenue-cost;
-				maxId=id;
-			} else if(maxValue==revenue-cost&&maxId>id) {
-				maxValue=revenue-cost;
-				maxId=id;
-			}
+			if(revenue>=cost) pq.add(new Product(id, revenue, dest, revenue-cost));
 		}
+	}
+
+	private static Object sale() {
+//		int maxValue=Integer.MIN_VALUE;
+//		int maxId=-1;
+//		for(Integer id:products.keySet()) {
+//			int revenue=products.get(id).revenue;
+//			int dest=products.get(id).dest;
+//			int cost=minDist[dest];
+//			
+//			if(cost==Integer.MAX_VALUE) continue;
+//			if(revenue<cost) continue;
+//			if(maxValue<revenue-cost) {
+//				maxValue=revenue-cost;
+//				maxId=id;
+//			} else if(maxValue==revenue-cost&&maxId>id) {
+//				maxValue=revenue-cost;
+//				maxId=id;
+//			}
+//		}
+//		
+//		if(maxId==-1) return -1;
+//		products.remove(maxId);
 		
-		if(maxId==-1) return -1;
-		products.remove(maxId);
-		return maxId;
+		while(pq.size()>0) {
+			Product selectProduct=pq.poll();
+			
+			if(!products.containsKey(selectProduct.id)) continue;
+			
+			products.remove(selectProduct.id);
+			
+			return selectProduct.id;
+		}
+		return -1;
 	}
 
 	private static void dijkstra(int start) {
