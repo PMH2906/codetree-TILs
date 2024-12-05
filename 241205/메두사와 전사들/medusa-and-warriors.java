@@ -253,22 +253,22 @@ public class Main {
 			
 			x=warrior.x+deltas[3][0];
 			y=warrior.y+deltas[3][1];
-			size=2;
+			size=1;
 			
 			if(warrior.x<start[0]) {	
 				while(y<N) {
 					int startX=Math.max(0, x-size);
 					
-					for(int nx=startX;nx<warrior.x;nx++) temp[nx][y]=false;
+					for(int nx=startX;nx<=warrior.x;nx++) temp[nx][y]=false;
 					x+=deltas[3][0];
 					y+=deltas[3][1];
 					size+=1;
 				}
 			} else if(warrior.x>start[0]) {
 				while(y<N) {
-					int endX=Math.min(N,warrior.x+size);
+					int endX=Math.min(N-1,warrior.x+size);
 					
-					for(int nx=warrior.x;nx<endX;nx++) temp[nx][y]=false;
+					for(int nx=warrior.x;nx<=endX;nx++) temp[nx][y]=false;
 					x+=deltas[3][0];
 					y+=deltas[3][1];
 					size+=1;
@@ -313,22 +313,22 @@ public class Main {
 			
 			x=warrior.x+deltas[2][0];
 			y=warrior.y+deltas[2][1];
-			size=2;
+			size=1;
 			
 			if(warrior.x<start[0]) {	
 				while(y>=0) {
 					int startX=Math.max(0, x-size);
 					
-					for(int nx=startX;nx<warrior.x;nx++) temp[nx][y]=false;
+					for(int nx=startX;nx<=warrior.x;nx++) temp[nx][y]=false;
 					x+=deltas[2][0];
 					y+=deltas[2][1];
 					size+=1;
 				}
 			} else if(warrior.x>start[0]) {
 				while(y>=0) {
-					int endX=Math.min(N,warrior.x+size);
+					int endX=Math.min(N-1,warrior.x+size);
 					
-					for(int nx=warrior.x;nx<endX;nx++) temp[nx][y]=false;
+					for(int nx=warrior.x;nx<=endX;nx++) temp[nx][y]=false;
 					x+=deltas[2][0];
 					y+=deltas[2][1];
 					size+=1;
@@ -373,21 +373,21 @@ public class Main {
 			
 			x=warrior.x+deltas[1][0];
 			y=warrior.y+deltas[1][1];
-			size=2;
+			size=1;
 			
 			if(warrior.y<start[1]) {	
 				while(x<N) {
 					int startY=Math.max(0, y-size);
 					
-					for(int ny=startY;ny<warrior.y;ny++) temp[x][ny]=false;
+					for(int ny=startY;ny<=warrior.y;ny++) temp[x][ny]=false;
 					x+=deltas[1][0];
 					y+=deltas[1][1];
 					size+=1;
 				}
 			} else if(warrior.y>start[1]) {
 				while(x<N) {
-					int endY=Math.min(N,warrior.y+size);
-					for(int ny=warrior.y;ny<endY;ny++) temp[x][ny]=false;
+					int endY=Math.min(N-1,warrior.y+size);
+					for(int ny=warrior.y;ny<=endY;ny++) temp[x][ny]=false;
 					x+=deltas[1][0];
 					y+=deltas[1][1];
 					size+=1;
@@ -432,13 +432,13 @@ public class Main {
 			
 			x=warrior.x+deltas[0][0];
 			y=warrior.y+deltas[0][1];
-			size=2;
+			size=1;
 			
 			if(warrior.y<start[1]) {	
 				while(x>=0) {
 					int startY=Math.max(0, y-size);
 					
-					for(int ny=startY;ny<warrior.y;ny++) temp[x][ny]=false;
+					for(int ny=startY;ny<=warrior.y;ny++) temp[x][ny]=false;
 					x+=deltas[0][0];
 					y+=deltas[0][1];
 					size+=1;
@@ -446,8 +446,8 @@ public class Main {
 			} else if(warrior.y>start[1]) {
 				while(x>=0) {
 					
-					int endY=Math.min(N,warrior.y+size);
-					for(int ny=warrior.y;ny<endY;ny++) temp[x][ny]=false;
+					int endY=Math.min(N-1,warrior.y+size);
+					for(int ny=warrior.y;ny<=endY;ny++) temp[x][ny]=false;
 					x+=deltas[0][0];
 					y+=deltas[0][1];
 					size+=1;
@@ -498,3 +498,4 @@ public class Main {
 	}
 
 }
+
