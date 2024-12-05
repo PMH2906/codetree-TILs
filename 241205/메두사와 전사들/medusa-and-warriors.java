@@ -121,7 +121,7 @@ public class Main {
 	private static void warriorStop() {
 		for(Warrior warrior:warriors) {
 			if(warrior.removed) continue;
-			 warrior.isStop=false; // 그 전 결과는 초기화 
+			warrior.isStop=false; // 그 전 결과는 초기화 
 			if(light[warrior.x][warrior.y]) {
 				warrior.isStop=true; // 현재 돌이 되었는지 셋팅 
 				stopCnt+=1; // 돌이 된 전사 수 구하기 
@@ -238,7 +238,7 @@ public class Main {
 		// 메두사 시야 확보 
 		while(y<N) {
 			int startX=Math.max(0, x-size/2);
-			int endX=Math.min(N,startX+size);
+			int endX=Math.min(N,x+size/2+1);
 			
 			for(int nx=startX;nx<endX;nx++) temp[nx][y]=true;
 			x+=deltas[3][0];
@@ -298,7 +298,7 @@ public class Main {
 		// 메두사 시야 확보 
 		while(y>=0) {
 			int startX=Math.max(0, x-size/2);
-			int endX=Math.min(N,startX+size);
+			int endX=Math.min(N,x+size/2+1);
 			
 			for(int nx=startX;nx<endX;nx++) temp[nx][y]=true;
 			x+=deltas[2][0];
@@ -358,7 +358,7 @@ public class Main {
 		// 메두사 시야 확보 
 		while(x<N) {
 			int startY=Math.max(0, y-size/2);
-			int endY=Math.min(N,startY+size);
+			int endY=Math.min(N,y+size/2+1);
 			
 			for(int ny=startY;ny<endY;ny++) temp[x][ny]=true;
 			x+=deltas[1][0];
@@ -416,8 +416,8 @@ public class Main {
 		
 		// 메두사 시야 확보 
 		while(x>=0) {
-			int startY=Math.max(0, y-size/2);
-			int endY=Math.min(N,startY+size);
+			int startY=Math.max(0, y-size/2+1);
+			int endY=Math.min(N,y+size/2);
 			
 			for(int ny=startY;ny<endY;ny++) temp[x][ny]=true;
 			x+=deltas[0][0];
