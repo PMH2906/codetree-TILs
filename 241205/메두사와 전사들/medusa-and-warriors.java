@@ -416,8 +416,8 @@ public class Main {
 		
 		// 메두사 시야 확보 
 		while(x>=0) {
-			int startY=Math.max(0, y-size/2+1);
-			int endY=Math.min(N,y+size/2);
+			int startY=Math.max(0, y-size/2);
+			int endY=Math.min(N,y+size/2+1);
 			
 			for(int ny=startY;ny<endY;ny++) temp[x][ny]=true;
 			x+=deltas[0][0];
