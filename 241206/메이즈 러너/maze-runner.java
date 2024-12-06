@@ -87,7 +87,8 @@ public class Main {
 		for(int k=0;k<K;k++) {
 			
 			move();
-			if(removedCnt==K) break;
+			if(removedCnt==M) break;
+//			System.out.println(removedCnt);
 			
 			rotate();
 			
