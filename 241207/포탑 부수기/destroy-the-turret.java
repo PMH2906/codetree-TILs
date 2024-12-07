@@ -100,7 +100,7 @@ public class Main {
 		}
 		
 		for(int k=1;k<=K;k++) {
-			if(potabCnt==1) break;
+//			if(potabCnt<=1) break;
 			
 			sortPotabs=new ArrayList<>();
 			for(int i=1;i<potabs.size();i++) {
@@ -120,6 +120,16 @@ public class Main {
 			
 			if(!attack1()) {
 				attack2();
+			}
+			
+//			for(int r=0;r<N;r++) System.out.println(Arrays.toString(map[r]));
+//			for(int i=1;i<potabs.size();i++) {
+//				System.out.println(potabs.get(i).toString() + potabCnt +" " + k+" " +K);
+//			}
+			
+			if(potabCnt<=1) {
+//				System.out.println(potabCnt+"--------------------");
+				break;
 			}
 			
 			// 6. 정비 
@@ -166,6 +176,10 @@ public class Main {
 			else if(nx>=N) nx=0;
 			if(ny<0) ny=M-1;
 			else if(ny>=M) ny=0;
+			
+			if(map[nx][ny]==0) continue;
+			// 공격자는 해당 공격에 영향을 받지 않습니다
+			if(nx==attack.x&&ny==attack.y) continue;
 			
 			// 8가지 방향 포탑 공격력 하락 
 			potabs.get(map[nx][ny]).power-=(potabs.get(map[attack.x][attack.y]).power/2);
