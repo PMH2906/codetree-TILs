@@ -14,7 +14,7 @@ public class Main {
     static StringBuilder output=new StringBuilder();
     static StringTokenizer tokens;
     static int N, M, time, removedCnt;
-    static int[][] map, deltas= {{-1,0},{1,0},{0,-1},{0,1}}; // 상하좌우 
+    static int[][] map, deltas= {{-1,0},{0,-1},{0,1},{1,0}}; // 상좌우하  
     static boolean[][] pass;
     static People[] peoples;
     
@@ -65,7 +65,6 @@ public class Main {
 		while(removedCnt<M) {
 			time+=1;
 			
-			// 1. 상, 하, 좌, 우 최단 거리로 1칸 움직이기
 			move();
 			
 			// 2. 편의점 도착 시 해당 편의점 지나갈 수 없음
@@ -78,9 +77,10 @@ public class Main {
 					pass[peoples[m].x][peoples[m].y]=true;
 				}
 			}
-
-			if(time<M) enter();
 			
+			if(time<M) enter();
+
+						
 //			for(int r=0;r<N;r++) System.out.println(Arrays.toString(map[r]));
 //			System.out.println();
 		}
