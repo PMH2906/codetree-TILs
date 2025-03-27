@@ -170,13 +170,13 @@ public class Main {
 			// 같으면 확산할 필요 없음 
 			if(ans!=now[2]) {
 				ans=now[2];
-				while(ans>=effectTime.peek()[0]) {
+				while(effectTime.size()>0&&ans>=effectTime.peek()[0]) {
 					int[] temp=effectTime.poll();
 					
 					int nx=effects[temp[1]].x+deltas[effects[temp[1]].d][0];
 					int ny=effects[temp[1]].y+deltas[effects[temp[1]].d][1];
 					
-					if(nx<0||nx>=N||ny<0||ny>=N||map[nx][ny]==1) continue;
+					if(nx<0||nx>=N||ny<0||ny>=N||map[nx][ny]==1||map[nx][ny]==4) continue;
 					
 					map[nx][ny]=1;
 					effects[temp[1]].x=nx;
@@ -221,7 +221,7 @@ public class Main {
 					int nx=effects[i].x+deltas[effects[i].d][0];
 					int ny=effects[i].y+deltas[effects[i].d][1];
 					
-					if(nx<0||nx>=N||ny<0||ny>=N||map[nx][ny]==1) continue loop;
+					if(nx<0||nx>=N||ny<0||ny>=N||map[nx][ny]==1||map[nx][ny]==4) continue loop;
 					
 					map[nx][ny]=1;
 					effects[i].x=nx;
