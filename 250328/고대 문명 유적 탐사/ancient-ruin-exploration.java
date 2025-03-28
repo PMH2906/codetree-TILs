@@ -1,5 +1,3 @@
-package algorithm;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +8,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class 고대문명 {
+public class Main {
 	
 	/**
 	 * 1. 회전 
