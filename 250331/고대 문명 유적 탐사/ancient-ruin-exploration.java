@@ -96,6 +96,7 @@ public class Main {
 			int maxCnt=Integer.MIN_VALUE;
 			int selectDegree=360, selectX=0, selectY=0;
 			int cnt=0;
+			// 가치 최대화, 각도 적은 것, 열이 가장 작은 구간, 행이 가장 작은 구간
 			for(int r=1;r<4;r++) {
 				for(int c=1;c<4;c++) {
 					for(int degree=90;degree<360;degree+=90) {
@@ -103,11 +104,29 @@ public class Main {
 						cnt=getDia1(false,temp);
 						
 //						System.out.println("회전 : "+degree+" 획득 : "+cnt+" x :"+r+" y : "+c);
-						if(cnt==maxCnt&&selectDegree>degree) {
-							selectDegree=degree;
-							maxCnt=cnt;
-							selectX=r;
-							selectY=c;							
+						if(cnt==maxCnt&&selectDegree>=degree) {
+							if(selectDegree==degree) {
+								if(selectY>c) {
+									selectDegree=degree;
+									maxCnt=cnt;
+									selectX=r;
+									selectY=c;
+								} else if(selectY==c) {
+									if(selectX>r) {
+										selectDegree=degree;
+										maxCnt=cnt;
+										selectX=r;
+										selectY=c;
+									}
+								}
+							}
+							else {
+								selectDegree=degree;
+								maxCnt=cnt;
+								selectX=r;
+								selectY=c;
+							}
+							
 						} else if(cnt>maxCnt) {
 							selectDegree=degree;
 							maxCnt=cnt;
